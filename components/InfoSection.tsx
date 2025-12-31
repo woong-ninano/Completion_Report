@@ -116,13 +116,8 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                   {item.title}
                 </h2>
                 <div className="w-12 h-[2px] bg-[#004a99] mb-8"></div>
-                <p className="text-lg md:text-xl text-gray-500 leading-relaxed font-light">
+                <p className="text-xl md:text-2xl text-[#666666] leading-relaxed font-light whitespace-pre-line">
                   {item.description}
-                  {item.subDescription && (
-                    <span className="block mt-6 text-gray-400 text-base md:text-lg border-l-2 border-gray-100 pl-4">
-                      {item.subDescription}
-                    </span>
-                  )}
                 </p>
               </div>
             ))}
@@ -131,7 +126,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
 
         {/* Right side: Device Frame (Centered vertically) */}
         <div className="flex-1 w-full md:w-[40%] order-1 md:order-2 flex flex-col items-center justify-center h-full">
-          {/* Added mt-16 (64px) as requested */}
           <div className="flex flex-col items-center w-full mt-16">
             {/* Device Border */}
             <div className="relative w-full max-w-[260px] md:max-w-[310px] aspect-[9/19] bg-white rounded-[3rem] p-2 shadow-[0_40px_100px_rgba(0,0,0,0.15)] border-[8px] border-black overflow-hidden transition-transform duration-500">

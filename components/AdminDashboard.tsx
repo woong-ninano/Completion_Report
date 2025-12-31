@@ -128,20 +128,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
           </div>
         </div>
 
-        {/* Instructions */}
-        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4 items-start">
-          <div className="bg-blue-500 text-white p-2 rounded-lg shrink-0">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-          </div>
-          <div>
-            <h4 className="text-sm font-bold text-blue-900 mb-1">관리자 안내</h4>
-            <p className="text-xs text-blue-700 leading-relaxed">
-              섹션별 넘버링(Section 01...)이 추가되어 구분이 쉬워졌습니다. 
-              내용 수정 후 상단의 <strong>[설정 저장하기]</strong>를 눌러야 클라우드에 최종 반영됩니다.
-            </p>
-          </div>
-        </div>
-
         {/* Header & Hero Settings */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
           <h2 className="text-xl font-bold mb-8 flex items-center gap-2">
@@ -165,10 +151,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
                   className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                 />
               </div>
-            </div>
-            <div className="flex flex-col gap-3">
-              <label className="text-sm font-bold text-gray-600">서브 타이틀</label>
-              <input name="headerTopText" value={editConfig.headerTopText} onChange={handleInputChange} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
             </div>
             <div className="flex flex-col gap-3">
               <label className="text-sm font-bold text-gray-600">프로젝트명</label>
@@ -223,15 +205,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
                         onChange={(e) => handleItemChange(idx, 'description', e.target.value)} 
                         placeholder="구축 결과나 특징을 설명해주세요."
                         className="bg-white border border-gray-200 rounded-xl px-4 py-3 h-28 outline-none focus:border-blue-500 resize-none transition-all leading-relaxed" 
-                      />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">보조 설명 (회색 작은 글씨)</label>
-                      <textarea 
-                        value={item.subDescription || ''} 
-                        onChange={(e) => handleItemChange(idx, 'subDescription', e.target.value)} 
-                        placeholder="추가적인 설명이 필요하다면 작성하세요."
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 h-20 outline-none focus:border-blue-500 resize-none text-sm transition-all" 
                       />
                     </div>
                   </div>

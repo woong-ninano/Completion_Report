@@ -44,7 +44,6 @@ const App: React.FC = () => {
   const fetchConfig = async () => {
     try {
       setLoading(true);
-      // maybeSingle()은 데이터가 없어도 에러를 내지 않고 null을 반환합니다.
       const { data, error } = await supabase
         .from('site_configs')
         .select('config')
@@ -58,7 +57,6 @@ const App: React.FC = () => {
 
       if (data && data.config) {
         const fetchedConfig = data.config as SiteConfig;
-        // DB에 비밀번호가 저장되어 있지 않은 경우를 대비
         if (!fetchedConfig.adminPassword) {
           fetchedConfig.adminPassword = "1234";
         }
@@ -76,7 +74,6 @@ const App: React.FC = () => {
 
   const saveConfig = async (newConfig: SiteConfig) => {
     try {
-      // id: 1을 고정값으로 사용하여 항상 같은 행을 업데이트합니다.
       const { error } = await supabase
         .from('site_configs')
         .upsert({ 
@@ -135,7 +132,6 @@ const App: React.FC = () => {
     const success = await saveConfig(newConfig);
     if (success) {
       alert('설정이 클라우드 서버에 영구적으로 저장되었습니다.');
-      // 저장 후 즉시 다시 불러와서 데이터 무결성 확인
       await fetchConfig();
     }
   };
@@ -182,7 +178,7 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header logoUrl={config.headerLogoUrl} projectTitle={config.headerProjectTitle} topText={config.headerTopText} />
+      <Header logoUrl={config.headerLogoUrl} projectTitle={config.headerProjectTitle} />
       <section id="hero" className="relative h-screen flex items-center justify-center bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 text-center z-10">
           <div className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-[#004a99] uppercase bg-blue-50 rounded-full">{config.heroBadge}</div>
