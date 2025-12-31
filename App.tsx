@@ -20,7 +20,7 @@ const INITIAL_CONFIG: SiteConfig = {
 };
 
 // 비밀번호 강제 초기화를 위한 마스터 키
-const MASTER_RESET_KEY = 'HYUNDAI_ADMIN_RESET';
+const MASTER_RESET_KEY = 'reset';
 
 const App: React.FC = () => {
   const [config, setConfig] = useState<SiteConfig>(INITIAL_CONFIG);
