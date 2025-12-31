@@ -101,17 +101,17 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-12 pb-24 px-6 overflow-y-auto">
+    <div className="min-h-screen bg-gray-50 pt-12 pb-24 px-6 overflow-y-auto text-[#333]">
       <div className="max-w-4xl mx-auto">
         {/* Sticky Header */}
-        <div className="sticky top-0 z-50 flex flex-col gap-4 mb-10 py-4 bg-gray-50/80 backdrop-blur-md">
+        <div className="sticky top-0 z-50 flex flex-col gap-4 mb-10 py-4 bg-gray-50/80 backdrop-blur-md border-b border-gray-100">
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <span className="text-[#004a99]">시스템</span> 관리자
               {isUploading && (
                 <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full">
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                  <span className="text-xs font-bold text-blue-500">UPLOAD ACTIVE</span>
+                  <span className="text-xs font-bold text-blue-500 uppercase">Uploading</span>
                 </div>
               )}
             </h1>
@@ -161,14 +161,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
 
         {/* Instructions */}
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4 items-start">
-          <div className="bg-blue-500 text-white p-2 rounded-lg">
+          <div className="bg-blue-500 text-white p-2 rounded-lg shrink-0">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
           <div>
             <h4 className="text-sm font-bold text-blue-900 mb-1">관리자 팁</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
-              이미지 업로드는 <code className="bg-blue-100 px-1 rounded font-bold">report-assets</code> 버킷에 저장됩니다. 
-              비밀번호를 변경하신 후에는 반드시 <strong>[설정 저장하기]</strong> 버튼을 눌러야 클라우드 DB에 반영됩니다.
+              섹션별로 구분하기 쉽게 <strong>넘버링(섹션 01...)</strong>을 추가했습니다. 
+              비밀번호 변경 후에는 반드시 <strong>[설정 저장하기]</strong>를 눌러야 클라우드 DB에 동기화됩니다.
             </p>
           </div>
         </div>
@@ -176,13 +176,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
         {/* Header & Hero Settings */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
           <h2 className="text-xl font-bold mb-8 flex items-center gap-2">
-            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> 헤더 및 히어로 설정
+            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> 기본 시스템 정보
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="flex flex-col gap-3">
-              <label className="text-sm font-bold text-gray-600">로고 이미지 등록</label>
+              <label className="text-sm font-bold text-gray-600">로고 이미지</label>
               <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-200 overflow-hidden">
+                <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-200 overflow-hidden shrink-0">
                   {editConfig.headerLogoUrl ? (
                     <img src={editConfig.headerLogoUrl} className="w-full h-full object-contain p-1" />
                   ) : (
@@ -198,19 +198,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
               </div>
             </div>
             <div className="flex flex-col gap-3">
-              <label className="text-sm font-bold text-gray-600">우측 상단 서브 타이틀</label>
-              <input name="headerTopText" value={editConfig.headerTopText} onChange={handleInputChange} placeholder="Project Completion Report" className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
+              <label className="text-sm font-bold text-gray-600">서브 타이틀</label>
+              <input name="headerTopText" value={editConfig.headerTopText} onChange={handleInputChange} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
             </div>
             <div className="flex flex-col gap-3">
-              <label className="text-sm font-bold text-gray-600">메인 프로젝트명</label>
+              <label className="text-sm font-bold text-gray-600">프로젝트명</label>
               <input name="headerProjectTitle" value={editConfig.headerProjectTitle} onChange={handleInputChange} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
             </div>
             <div className="flex flex-col gap-3">
-              <label className="text-sm font-bold text-gray-600">히어로 뱃지 텍스트</label>
+              <label className="text-sm font-bold text-gray-600">뱃지 텍스트</label>
               <input name="heroBadge" value={editConfig.heroBadge} onChange={handleInputChange} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
             </div>
             <div className="flex flex-col gap-3 md:col-span-2">
-              <label className="text-sm font-bold text-gray-600">히어로 타이틀 (줄바꿈 \n 사용)</label>
+              <label className="text-sm font-bold text-gray-600">메인 히어로 타이틀 (\n 개행 가능)</label>
               <textarea name="heroTitle1" value={editConfig.heroTitle1} onChange={handleInputChange} rows={2} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all font-bold resize-none" />
             </div>
           </div>
@@ -220,40 +220,49 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div> 상세 컨텐츠 섹션
+              <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div> 상세 컨텐츠 구성
             </h2>
             <button onClick={addItem} className="px-6 py-2 bg-orange-50 text-orange-600 font-bold rounded-xl hover:bg-orange-100 transition-all text-sm">+ 섹션 추가</button>
           </div>
 
-          <div className="space-y-16">
+          <div className="space-y-12">
             {editConfig.contentItems.map((item, idx) => (
-              <div key={idx} className="p-8 bg-gray-50 rounded-2xl relative group border border-transparent hover:border-gray-200 transition-all">
-                <button onClick={() => removeItem(idx)} className="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition-colors">
+              <div key={idx} className="p-8 bg-gray-50 rounded-2xl relative group border border-gray-100 hover:border-blue-200 transition-all">
+                {/* Section Number Badge */}
+                <div className="absolute -top-3 left-6 px-4 py-1.5 bg-[#004a99] text-white text-[10px] font-black rounded-full shadow-lg z-10 tracking-widest uppercase">
+                  Section {(idx + 1).toString().padStart(2, '0')}
+                </div>
+
+                <button onClick={() => removeItem(idx)} className="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition-colors p-2 rounded-full hover:bg-red-50">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                 </button>
-                <div className="flex flex-col gap-6">
+
+                <div className="flex flex-col gap-6 mt-2">
                   <div className="grid grid-cols-1 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">타이틀</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">타이틀</label>
                       <input 
                         value={item.title} 
                         onChange={(e) => handleItemChange(idx, 'title', e.target.value)} 
+                        placeholder="섹션의 제목을 입력하세요."
                         className="text-xl font-bold bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" 
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">상세 설명</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">상세 설명</label>
                       <textarea 
                         value={item.description} 
                         onChange={(e) => handleItemChange(idx, 'description', e.target.value)} 
+                        placeholder="구축 결과나 특징을 설명해주세요."
                         className="bg-white border border-gray-200 rounded-xl px-4 py-3 h-28 outline-none focus:border-blue-500 resize-none transition-all leading-relaxed" 
                       />
                     </div>
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">보조 설명 (선택)</label>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">보조 설명 (회색 작은 글씨)</label>
                       <textarea 
                         value={item.subDescription || ''} 
                         onChange={(e) => handleItemChange(idx, 'subDescription', e.target.value)} 
+                        placeholder="추가적인 설명이 필요하다면 작성하세요."
                         className="bg-white border border-gray-200 rounded-xl px-4 py-3 h-20 outline-none focus:border-blue-500 resize-none text-sm transition-all" 
                       />
                     </div>
@@ -261,24 +270,30 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
                   
                   <div className="flex flex-col gap-4">
                     <div className="flex justify-between items-center">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">디바이스 이미지 (업로드)</label>
-                      <button onClick={() => addImageField(idx)} className="text-xs text-[#004a99] font-bold hover:underline">+ 이미지 추가</button>
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">디바이스 이미지 업로드</label>
+                      <button onClick={() => addImageField(idx)} className="text-xs text-[#004a99] font-bold hover:underline px-3 py-1 bg-blue-50 rounded-lg">+ 이미지 추가</button>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                       {item.images.map((img, imgIdx) => (
-                        <div key={imgIdx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                        <div key={imgIdx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-3 group/img transition-all hover:shadow-md">
                           <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-bold text-gray-300">이미지 #{imgIdx + 1}</span>
-                            <button onClick={() => removeImageField(idx, imgIdx)} className="text-gray-300 hover:text-red-500">
+                            <span className="text-[10px] font-bold text-gray-300">IMAGE {imgIdx + 1}</span>
+                            <button onClick={() => removeImageField(idx, imgIdx)} className="text-gray-300 hover:text-red-500 transition-colors">
                               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
                             </button>
                           </div>
-                          {img && <img src={img} className="h-32 w-full object-contain bg-gray-50 rounded-lg mb-2" />}
+                          <div className="h-32 w-full bg-gray-50 rounded-lg mb-2 overflow-hidden flex items-center justify-center border border-gray-50">
+                            {img ? (
+                              <img src={img} className="h-full w-full object-contain" />
+                            ) : (
+                              <div className="text-[10px] text-gray-300 font-medium">이미지 없음</div>
+                            )}
+                          </div>
                           <input 
                             type="file" 
                             accept="image/*" 
                             onChange={(e) => handleFileUpload(e, 'itemImage', idx, imgIdx)}
-                            className="text-[10px] file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
+                            className="text-[10px] w-full file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
                           />
                         </div>
                       ))}
@@ -288,6 +303,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
               </div>
             ))}
           </div>
+          
+          {editConfig.contentItems.length === 0 && (
+            <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+              <p className="text-gray-400 text-sm">등록된 섹션이 없습니다. 상단의 버튼을 눌러 추가해주세요.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

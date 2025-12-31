@@ -19,6 +19,9 @@ const INITIAL_CONFIG: SiteConfig = {
   adminPassword: "1234" // 초기 비밀번호
 };
 
+// 비밀번호 강제 초기화를 위한 마스터 키
+const MASTER_RESET_KEY = 'HYUNDAI_ADMIN_RESET';
+
 const App: React.FC = () => {
   const [config, setConfig] = useState<SiteConfig>(INITIAL_CONFIG);
   const [loading, setLoading] = useState(true);
@@ -47,7 +50,6 @@ const App: React.FC = () => {
         if (error) throw error;
         if (data) {
           const fetchedConfig = data.config as SiteConfig;
-          // DB에 비밀번호가 없으면 초기값 유지
           if (!fetchedConfig.adminPassword) {
             fetchedConfig.adminPassword = "1234";
           }
@@ -73,15 +75,31 @@ const App: React.FC = () => {
       if (error) throw error;
       
       setConfig(newConfig);
-      alert('데이터가 클라우드 DB에 안전하게 저장되었습니다.');
+      return true;
     } catch (err) {
       console.error('Supabase save error:', err);
-      alert('저장 중 오류가 발생했습니다.');
+      return false;
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // 마스터 리셋 키 체크
+    if (passwordInput === MASTER_RESET_KEY) {
+      if (window.confirm("마스터 키가 입력되었습니다. 비밀번호를 '1234'로 초기화하시겠습니까?")) {
+        const resetConfig = { ...config, adminPassword: '1234' };
+        const success = await saveConfig(resetConfig);
+        if (success) {
+          alert('비밀번호가 1234로 초기화되었습니다. 다시 로그인해주세요.');
+          setPasswordInput('');
+        } else {
+          alert('초기화 중 오류가 발생했습니다.');
+        }
+      }
+      return;
+    }
+
     const currentPassword = config.adminPassword || '1234';
     if (passwordInput === currentPassword) {
       setIsLoggedIn(true);
@@ -95,6 +113,15 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setIsLoggedIn(false);
     sessionStorage.removeItem('admin_auth');
+  };
+
+  const onAdminSave = async (newConfig: SiteConfig) => {
+    const success = await saveConfig(newConfig);
+    if (success) {
+      alert('데이터가 클라우드 DB에 안전하게 저장되었습니다.');
+    } else {
+      alert('저장 중 오류가 발생했습니다.');
+    }
   };
 
   if (loading) {
@@ -146,7 +173,7 @@ const App: React.FC = () => {
         </div>
       );
     }
-    return <AdminDashboard config={config} onSave={saveConfig} onLogout={handleLogout} />;
+    return <AdminDashboard config={config} onSave={onAdminSave} onLogout={handleLogout} />;
   }
 
   return (
