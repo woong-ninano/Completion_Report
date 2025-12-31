@@ -19,7 +19,7 @@ const INITIAL_CONFIG: SiteConfig = {
   adminPassword: "1234"
 };
 
-// 마스터 리셋 키: reset (대소문자 무관)
+// 마스터 리셋 키: reset (로그인 창에 입력 후 접속하기 클릭)
 const MASTER_RESET_KEY = 'reset';
 
 const App: React.FC = () => {
@@ -47,9 +47,13 @@ const App: React.FC = () => {
           .eq('id', 1)
           .single();
 
-        if (error) throw error;
-        if (data) {
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "No rows found"
+          throw error;
+        }
+
+        if (data && data.config) {
           const fetchedConfig = data.config as SiteConfig;
+          // 비밀번호가 없으면 초기값 설정
           if (!fetchedConfig.adminPassword) {
             fetchedConfig.adminPassword = "1234";
           }
@@ -67,10 +71,14 @@ const App: React.FC = () => {
 
   const saveConfig = async (newConfig: SiteConfig) => {
     try {
+      // update 대신 upsert를 사용하여 데이터가 없으면 새로 생성(ID: 1)
       const { error } = await supabase
         .from('site_configs')
-        .update({ config: newConfig, updated_at: new Date() })
-        .eq('id', 1);
+        .upsert({ 
+          id: 1, 
+          config: newConfig, 
+          updated_at: new Date().toISOString() 
+        }, { onConflict: 'id' });
 
       if (error) throw error;
       
@@ -85,11 +93,11 @@ const App: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const input = passwordInput.trim().toLowerCase();
+    const input = passwordInput.trim();
     
-    // 마스터 리셋 키 체크
-    if (input === MASTER_RESET_KEY.toLowerCase()) {
-      const confirmReset = window.confirm("비상용 초기화 키가 감지되었습니다. 비밀번호를 '1234'로 리셋하시겠습니까?");
+    // 1. 마스터 리셋 키 체크 (대소문자 무시)
+    if (input.toLowerCase() === MASTER_RESET_KEY.toLowerCase()) {
+      const confirmReset = window.confirm("비상용 초기화 키가 감지되었습니다. 모든 내용을 유지한 채 비밀번호만 '1234'로 리셋하시겠습니까?");
       if (confirmReset) {
         const resetConfig = { ...config, adminPassword: '1234' };
         const success = await saveConfig(resetConfig);
@@ -97,14 +105,15 @@ const App: React.FC = () => {
           alert("비밀번호가 '1234'로 초기화되었습니다. 이제 1234를 입력하여 접속하세요.");
           setPasswordInput('');
         } else {
-          alert('저장 실패: 네트워크 상태를 확인해주세요.');
+          alert('초기화 실패: DB 연결 상태를 확인해주세요.');
         }
       }
       return;
     }
 
+    // 2. 일반 비밀번호 체크
     const currentPassword = config.adminPassword || '1234';
-    if (passwordInput.trim() === currentPassword) {
+    if (input === currentPassword) {
       setIsLoggedIn(true);
       sessionStorage.setItem('admin_auth', 'true');
       setPasswordInput('');
@@ -121,9 +130,9 @@ const App: React.FC = () => {
   const onAdminSave = async (newConfig: SiteConfig) => {
     const success = await saveConfig(newConfig);
     if (success) {
-      alert('데이터가 클라우드 DB에 안전하게 저장되었습니다.');
+      alert('설정이 성공적으로 저장되었습니다.');
     } else {
-      alert('저장 중 오류가 발생했습니다.');
+      alert('저장 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
     }
   };
 
@@ -132,7 +141,7 @@ const App: React.FC = () => {
       <div className="h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-sm font-bold text-gray-400">데이터 로딩 중...</p>
+          <p className="text-sm font-bold text-gray-400">시스템 데이터를 불러오는 중...</p>
         </div>
       </div>
     );
@@ -206,7 +215,9 @@ const App: React.FC = () => {
       </section>
 
       <main className="bg-white">
-        {config.contentItems.length > 0 && <InfoSection items={config.contentItems} id="main-content" />}
+        {config.contentItems && config.contentItems.length > 0 && (
+          <InfoSection items={config.contentItems} id="main-content" />
+        )}
       </main>
 
       <footer className="bg-white py-24 border-t border-gray-100">
