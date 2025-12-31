@@ -19,7 +19,7 @@ const INITIAL_CONFIG: SiteConfig = {
   adminPassword: "1234"
 };
 
-// 마스터 리셋 키: HYUNDAI_ADMIN_RESET (정확히 입력 후 '접속하기' 클릭)
+// 마스터 리셋 키: reset (대소문자 무관)
 const MASTER_RESET_KEY = 'reset';
 
 const App: React.FC = () => {
@@ -28,7 +28,7 @@ const App: React.FC = () => {
   const [isAdminRoute, setIsAdminRoute] = useState(window.location.hash === '#admin');
   const [isLoggedIn, setIsLoggedIn] = useState(sessionStorage.getItem('admin_auth') === 'true');
   const [passwordInput, setPasswordInput] = useState('');
-  const [footerLogoError, setFooterLogoError] = useState(false);
+  const [footerLogoError, setLogoError] = useState(false);
 
   useEffect(() => {
     const handleHashChange = () => {
@@ -85,10 +85,10 @@ const App: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    const input = passwordInput.trim();
+    const input = passwordInput.trim().toLowerCase();
     
-    // 마스터 리셋 키 체크 (대소문자 무시)
-    if (input.toUpperCase() === MASTER_RESET_KEY) {
+    // 마스터 리셋 키 체크
+    if (input === MASTER_RESET_KEY.toLowerCase()) {
       const confirmReset = window.confirm("비상용 초기화 키가 감지되었습니다. 비밀번호를 '1234'로 리셋하시겠습니까?");
       if (confirmReset) {
         const resetConfig = { ...config, adminPassword: '1234' };
@@ -104,7 +104,7 @@ const App: React.FC = () => {
     }
 
     const currentPassword = config.adminPassword || '1234';
-    if (input === currentPassword) {
+    if (passwordInput.trim() === currentPassword) {
       setIsLoggedIn(true);
       sessionStorage.setItem('admin_auth', 'true');
       setPasswordInput('');
@@ -213,7 +213,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="flex justify-center items-center mb-8 h-12">
             {!footerLogoError ? (
-              <img src={config.headerLogoUrl} alt="로고" className="h-9 md:h-10 object-contain" onError={() => setFooterLogoError(true)} />
+              <img src={config.headerLogoUrl} alt="로고" className="h-9 md:h-10 object-contain" onError={() => setLogoError(true)} />
             ) : (
               <div className="text-[#004a99] font-bold text-2xl tracking-tighter">현대해상 <span className="text-[#ff6a00]">다이렉트</span></div>
             )}

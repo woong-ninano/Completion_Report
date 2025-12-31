@@ -97,7 +97,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
     setEditConfig(prev => ({ ...prev, adminPassword: newPassword }));
     setNewPassword('');
     setShowPwdChange(false);
-    alert('비밀번호가 변경되었습니다. (저장 버튼을 눌러야 최종 반영됩니다)');
+    alert('비밀번호가 변경되었습니다. 상단의 [설정 저장하기] 버튼을 눌러야 최종 반영됩니다.');
   };
 
   return (
@@ -126,31 +126,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
               </button>
             </div>
           </div>
-
-          {/* Hidden Password Change Sub-panel */}
-          {showPwdChange && (
-            <div className="bg-orange-50 p-6 rounded-2xl shadow-sm border border-orange-100 flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
-              <div className="flex items-center gap-4 flex-1">
-                <span className="text-sm font-bold text-orange-900">새 비밀번호:</span>
-                <input 
-                  type="text"
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="새로운 비밀번호 입력"
-                  className="flex-1 max-w-xs border border-orange-200 rounded-lg px-4 py-2 outline-none focus:border-orange-500 text-sm"
-                />
-                <button 
-                  onClick={changePassword}
-                  className="bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-700 transition-colors shadow-sm"
-                >
-                  변경 확인
-                </button>
-              </div>
-              <button onClick={() => setShowPwdChange(false)} className="text-orange-400 p-2 hover:text-orange-600">
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Instructions */}
@@ -298,11 +273,35 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
           </div>
         </div>
 
-        {/* Hidden Area for Password Change */}
-        <div className="mt-20 flex justify-center opacity-0 hover:opacity-100 transition-opacity">
+        {/* Hidden Area for Password Change (Panel Moved Here) */}
+        <div className="mt-20 flex flex-col items-center gap-4">
+          {showPwdChange && (
+            <div className="bg-orange-50 p-6 rounded-2xl shadow-xl border border-orange-100 flex flex-col md:flex-row items-center gap-4 animate-in slide-in-from-bottom-4 duration-300 w-full max-w-lg mb-4">
+              <div className="flex items-center gap-4 flex-1 w-full">
+                <span className="text-sm font-bold text-orange-900 shrink-0">새 암호:</span>
+                <input 
+                  type="text"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="새로운 비밀번호 입력"
+                  className="flex-1 border border-orange-200 rounded-lg px-4 py-2 outline-none focus:border-orange-500 text-sm"
+                />
+                <button 
+                  onClick={changePassword}
+                  className="bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-700 transition-colors shadow-sm shrink-0"
+                >
+                  변경
+                </button>
+              </div>
+              <button onClick={() => setShowPwdChange(false)} className="text-orange-400 p-2 hover:text-orange-600 self-end md:self-center">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+          )}
+          
           <button 
             onClick={() => setShowPwdChange(!showPwdChange)}
-            className="text-[10px] text-gray-300 underline decoration-dotted font-bold px-4 py-2"
+            className="text-[10px] text-gray-300 underline decoration-dotted font-bold px-4 py-2 opacity-0 hover:opacity-100 transition-opacity"
           >
             ADMIN_SECURITY_SETTINGS
           </button>
