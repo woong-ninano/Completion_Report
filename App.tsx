@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import InfoSection from './components/InfoSection';
-import MetricChart from './components/MetricChart';
 import AdminDashboard from './components/AdminDashboard';
-import { SiteConfig, MetricData } from './types';
+import { SiteConfig } from './types';
 import { supabase } from './lib/supabase';
 
 const INITIAL_CONFIG: SiteConfig = {
@@ -100,18 +99,6 @@ const App: React.FC = () => {
     return <AdminDashboard config={config} onSave={saveConfig} onLogout={handleLogout} />;
   }
 
-  const performanceMetrics: MetricData[] = [
-    { name: '기존 로딩', value: 3.8 },
-    { name: '목표 속도', value: 2.0 },
-    { name: '현재 성능', value: 1.2 },
-  ];
-
-  const satisfactionMetrics: MetricData[] = [
-    { name: '사용 편의성', value: 92 },
-    { name: '디자인 만족도', value: 95 },
-    { name: '추천 의향', value: 88 },
-  ];
-
   return (
     <div className="min-h-screen bg-white">
       <Header logoUrl={config.headerLogoUrl} projectTitle={config.headerProjectTitle} />
@@ -137,19 +124,6 @@ const App: React.FC = () => {
       <main className="bg-white">
         {config.contentItems.length > 0 && <InfoSection items={config.contentItems} id="main-content" />}
       </main>
-
-      <section className="py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">데이터로 증명하는 혁신</h2>
-            <p className="text-gray-500">고도화 프로젝트 이후 주요 지표의 괄목할만한 성장을 확인하세요.</p>
-          </div>
-          <div className="grid md:grid-cols-2 gap-8">
-            <MetricChart data={performanceMetrics} title="페이지 로딩 성능 개선 (단위: 초)" />
-            <MetricChart data={satisfactionMetrics} title="사용자 만족도 조사 (단위: %)" />
-          </div>
-        </div>
-      </section>
 
       <footer className="bg-white py-24 border-t border-gray-100">
         <div className="max-w-7xl mx-auto px-6 text-center">
