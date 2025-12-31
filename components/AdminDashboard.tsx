@@ -12,6 +12,8 @@ interface AdminDashboardProps {
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogout }) => {
   const [editConfig, setEditConfig] = useState<SiteConfig>(config);
   const [isUploading, setIsUploading] = useState(false);
+  const [showPwdChange, setShowPwdChange] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,16 +42,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
       }
     } catch (error: any) {
       console.error('Detailed Upload Error:', error);
-      
       let errorMsg = '파일 업로드 중 오류가 발생했습니다.';
       if (error.message?.includes('RLS')) {
-        errorMsg += '\n\n[권한 오류 발생]\nSupabase Storage의 Policies 설정에서 INSERT(업로드) 권한이 "true" 또는 "bucket_id = \'report-assets\'"로 설정되어 있는지 확인해주세요.';
+        errorMsg += '\n\n[권한 오류 발생]\nPolicies 설정을 확인해주세요.';
       } else if (error.message?.includes('Bucket not found')) {
-        errorMsg += '\n\n[버킷 없음]\nSupabase Storage에 "report-assets"라는 이름의 버킷이 생성되어 있는지 확인해주세요.';
+        errorMsg += '\n\n[버킷 없음]\n"report-assets" 버킷을 확인해주세요.';
       } else {
         errorMsg += `\n원인: ${error.message}`;
       }
-      
       alert(errorMsg);
     } finally {
       setIsUploading(false);
@@ -92,45 +92,88 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
     setEditConfig(prev => ({ ...prev, contentItems: newItems }));
   };
 
+  const changePassword = () => {
+    if (!newPassword.trim()) return alert('새 비밀번호를 입력해주세요.');
+    setEditConfig(prev => ({ ...prev, adminPassword: newPassword }));
+    setNewPassword('');
+    setShowPwdChange(false);
+    alert('비밀번호가 변경되었습니다. (저장 버튼을 눌러야 최종 반영됩니다)');
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-12 pb-24 px-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto">
-        <div className="sticky top-0 z-50 flex justify-between items-center mb-10 py-4 bg-gray-50/80 backdrop-blur-md">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <span className="text-[#004a99]">시스템</span> 관리자
-            {isUploading && (
-              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full">
-                <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                <span className="text-xs font-bold text-blue-500">UPLOAD ACTIVE</span>
-              </div>
-            )}
-          </h1>
-          <div className="flex gap-4">
-            <button onClick={() => window.location.hash = ''} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">홈으로</button>
-            <button onClick={onLogout} className="px-4 py-2 text-sm text-red-500 hover:text-red-700 transition-colors">로그아웃</button>
-            <button 
-              disabled={isUploading}
-              onClick={() => onSave(editConfig)} 
-              className={`px-8 py-2 bg-[#004a99] text-white font-bold rounded-xl hover:bg-blue-800 transition-all shadow-lg hover:shadow-blue-200/50 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
-            >
-              설정 저장하기
-            </button>
+        {/* Sticky Header */}
+        <div className="sticky top-0 z-50 flex flex-col gap-4 mb-10 py-4 bg-gray-50/80 backdrop-blur-md">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <span className="text-[#004a99]">시스템</span> 관리자
+              {isUploading && (
+                <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                  <span className="text-xs font-bold text-blue-500">UPLOAD ACTIVE</span>
+                </div>
+              )}
+            </h1>
+            <div className="flex gap-3">
+              <button 
+                onClick={() => setShowPwdChange(!showPwdChange)} 
+                className={`px-4 py-2 text-sm font-medium rounded-xl border transition-all ${showPwdChange ? 'bg-gray-200 border-gray-300' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+              >
+                비밀번호 변경
+              </button>
+              <button onClick={onLogout} className="px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-all">로그아웃</button>
+              <button 
+                disabled={isUploading}
+                onClick={() => onSave(editConfig)} 
+                className={`px-8 py-2 bg-[#004a99] text-white font-bold rounded-xl hover:bg-blue-800 transition-all shadow-lg hover:shadow-blue-200/50 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              >
+                설정 저장하기
+              </button>
+            </div>
           </div>
+
+          {/* Password Change Sub-panel */}
+          {showPwdChange && (
+            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
+              <div className="flex items-center gap-4 flex-1">
+                <span className="text-sm font-bold text-gray-700">새 비밀번호:</span>
+                <input 
+                  type="text"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="새로운 비밀번호 입력"
+                  className="flex-1 max-w-xs border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:border-blue-500 text-sm"
+                />
+                <button 
+                  onClick={changePassword}
+                  className="bg-gray-900 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-black transition-colors"
+                >
+                  변경 확인
+                </button>
+              </div>
+              <button onClick={() => setShowPwdChange(false)} className="text-gray-400 p-1 hover:text-gray-600">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+            </div>
+          )}
         </div>
 
+        {/* Instructions */}
         <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4 items-start">
           <div className="bg-blue-500 text-white p-2 rounded-lg">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-blue-900 mb-1">업로드 오류가 발생하나요?</h4>
+            <h4 className="text-sm font-bold text-blue-900 mb-1">관리자 팁</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
-              Supabase Storage 설정에서 <code className="bg-blue-100 px-1 rounded font-bold">report-assets</code> 버킷이 <strong>Public</strong>으로 생성되어 있어야 하며, 
-              <strong>Policies</strong>에서 <code className="bg-blue-100 px-1 rounded font-bold">INSERT</code> 권한의 조건이 <code className="bg-blue-100 px-1 rounded font-bold">true</code>로 설정되어 있어야 합니다.
+              이미지 업로드는 <code className="bg-blue-100 px-1 rounded font-bold">report-assets</code> 버킷에 저장됩니다. 
+              비밀번호를 변경하신 후에는 반드시 <strong>[설정 저장하기]</strong> 버튼을 눌러야 클라우드 DB에 반영됩니다.
             </p>
           </div>
         </div>
 
+        {/* Header & Hero Settings */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
           <h2 className="text-xl font-bold mb-8 flex items-center gap-2">
             <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> 헤더 및 히어로 설정
@@ -173,6 +216,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
           </div>
         </div>
 
+        {/* Content Sections */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-bold flex items-center gap-2">
