@@ -14,6 +14,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
   const [isUploading, setIsUploading] = useState(false);
   const [showPwdChange, setShowPwdChange] = useState(false);
   const [newPassword, setNewPassword] = useState('');
+  const [showRlsGuide, setShowRlsGuide] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -40,9 +41,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
         newItems[itemIdx].images[imgIdx] = publicUrl;
         setEditConfig(prev => ({ ...prev, contentItems: newItems }));
       }
+      setShowRlsGuide(false);
     } catch (error: any) {
       console.error('Upload Error:', error);
-      alert('파일 업로드 중 오류가 발생했습니다: ' + error.message);
+      if (error.message.includes('row-level security policy') || error.message.includes('RLS')) {
+        setShowRlsGuide(true);
+      } else {
+        alert('파일 업로드 중 오류가 발생했습니다: ' + error.message);
+      }
     } finally {
       setIsUploading(false);
       e.target.value = '';
@@ -94,6 +100,31 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
 
   return (
     <div className="min-h-screen bg-gray-50 pt-12 pb-24 px-6 overflow-y-auto text-[#333]">
+      {/* RLS Error Modal */}
+      {showRlsGuide && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full p-8 animate-in zoom-in-95 duration-200">
+            <div className="w-16 h-16 bg-red-50 rounded-full flex items-center justify-center mb-6">
+              <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2">권한 설정이 필요합니다</h3>
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+              Supabase Storage의 보안 정책(RLS) 때문에 업로드가 차단되었습니다.<br/>
+              <b>해결 방법:</b><br/>
+              1. Supabase 대시보드 - Storage 접속<br/>
+              2. <code className="bg-gray-100 px-1 rounded text-red-500">report-assets</code> 버킷의 Policies 클릭<br/>
+              3. New Policy - INSERT/SELECT 권한을 <code className="bg-gray-100 px-1 rounded font-bold">anon</code>에게 허용(Policy definition: <code className="text-blue-600 font-bold">true</code>)
+            </p>
+            <button 
+              onClick={() => setShowRlsGuide(false)}
+              className="w-full py-4 bg-[#004a99] text-white font-bold rounded-2xl hover:bg-blue-800 transition-all shadow-lg"
+            >
+              확인했습니다
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-4xl mx-auto">
         {/* Sticky Header */}
         <div className="sticky top-0 z-50 flex flex-col gap-4 mb-10 py-4 bg-gray-50/80 backdrop-blur-md border-b border-gray-100">
