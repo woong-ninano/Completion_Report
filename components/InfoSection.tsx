@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { SectionData } from '../types';
 
@@ -128,75 +129,76 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
           </div>
         </div>
 
-        {/* Right side: Device Frame with Draggable Image */}
-        <div className="flex-1 w-full md:w-[40%] order-1 md:order-2 flex flex-col items-center justify-center py-10">
-          {/* Device Border changed to black */}
-          <div className="relative w-full max-w-[260px] md:max-w-[310px] aspect-[9/19] bg-white rounded-[3rem] p-2 shadow-[0_40px_100px_rgba(0,0,0,0.2)] border-[8px] border-black overflow-hidden">
-            {/* Speaker/Notch - matching black theme */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-30"></div>
-            
-            {/* Screen Content Container (Scrollable by Drag) */}
-            <div 
-              ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
-              onMouseDown={onMouseDown}
-              onMouseLeave={onMouseLeave}
-              onMouseUp={onMouseUp}
-              onMouseMove={onMouseMove}
-              className={`relative w-full h-full overflow-y-auto rounded-[2.4rem] bg-gray-50 no-scrollbar ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-              style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
-            >
-              <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
+        {/* Right side: Device Frame (Centered vertically) */}
+        <div className="flex-1 w-full md:w-[40%] order-1 md:order-2 flex flex-col items-center justify-center h-full">
+          <div className="flex flex-col items-center w-full">
+            {/* Device Border changed to black */}
+            <div className="relative w-full max-w-[260px] md:max-w-[310px] aspect-[9/19] bg-white rounded-[3rem] p-2 shadow-[0_40px_100px_rgba(0,0,0,0.15)] border-[8px] border-black overflow-hidden transition-transform duration-500">
+              {/* Speaker/Notch - matching black theme */}
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-30"></div>
               
-              {items.map((item, itemIdx) => (
-                <div 
-                  key={itemIdx}
-                  className={`absolute inset-0 transition-opacity duration-700 ${itemIdx === activeItemIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
-                >
-                  {item.images.map((img, imgIdx) => (
-                    <div
-                      key={imgIdx}
-                      className={`absolute inset-0 w-full transition-all duration-500 transform ${
-                        imgIdx === subImageIndices[itemIdx] ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
-                      }`}
-                    >
-                      <img
-                        src={img}
-                        alt={`Screen ${itemIdx}-${imgIdx}`}
-                        className="w-full object-contain object-top"
-                        draggable={false} // 브라우저 기본 드래그 방지
-                      />
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Sub-Image Navigation Controls */}
-          <div className="flex items-center gap-6 mt-8 bg-gray-50 px-6 py-3 rounded-full border border-gray-100 shadow-sm">
-            <button 
-              onClick={handlePrevSubImage}
-              disabled={currentSubImageIndex === 0}
-              className={`p-2 rounded-full text-gray-400 hover:bg-white hover:text-gray-900 transition-all ${currentSubImageIndex === 0 ? 'opacity-20 cursor-not-allowed' : 'active:scale-90 shadow-sm border border-gray-100'}`}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
-            </button>
-            
-            <div className="text-sm font-bold text-gray-900 tabular-nums flex items-center">
-              <span className="text-[#004a99] w-4 text-center">{currentSubImageIndex + 1}</span>
-              <span className="mx-2 text-gray-300">/</span>
-              <span className="text-gray-400 w-4 text-center">{currentItemImages.length}</span>
+              {/* Screen Content Container (Scrollable by Drag) */}
+              <div 
+                ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
+                onMouseDown={onMouseDown}
+                onMouseLeave={onMouseLeave}
+                onMouseUp={onMouseUp}
+                onMouseMove={onMouseMove}
+                className={`relative w-full h-full overflow-y-auto rounded-[2.4rem] bg-gray-50 no-scrollbar ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
+              >
+                <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
+                
+                {items.map((item, itemIdx) => (
+                  <div 
+                    key={itemIdx}
+                    className={`absolute inset-0 transition-opacity duration-700 ${itemIdx === activeItemIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                  >
+                    {item.images.map((img, imgIdx) => (
+                      <div
+                        key={imgIdx}
+                        className={`absolute inset-0 w-full transition-all duration-500 transform ${
+                          imgIdx === subImageIndices[itemIdx] ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+                        }`}
+                      >
+                        <img
+                          src={img}
+                          alt={`Screen ${itemIdx}-${imgIdx}`}
+                          className="w-full object-contain object-top"
+                          draggable={false} // 브라우저 기본 드래그 방지
+                        />
+                      </div>
+                    ))}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <button 
-              onClick={handleNextSubImage}
-              disabled={currentSubImageIndex === currentItemImages.length - 1}
-              className={`p-2 rounded-full text-gray-400 hover:bg-white hover:text-gray-900 transition-all ${currentSubImageIndex === currentItemImages.length - 1 ? 'opacity-20 cursor-not-allowed' : 'active:scale-90 shadow-sm border border-gray-100'}`}
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
-            </button>
+            {/* Sub-Image Navigation Controls */}
+            <div className="flex items-center gap-6 mt-8 bg-gray-50/50 px-6 py-3 rounded-full border border-gray-100 shadow-sm backdrop-blur-sm">
+              <button 
+                onClick={handlePrevSubImage}
+                disabled={currentSubImageIndex === 0}
+                className={`p-2 rounded-full text-gray-400 hover:bg-white hover:text-gray-900 transition-all ${currentSubImageIndex === 0 ? 'opacity-20 cursor-not-allowed' : 'active:scale-90 shadow-sm border border-gray-100'}`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
+              </button>
+              
+              <div className="text-sm font-bold text-gray-900 tabular-nums flex items-center">
+                <span className="text-[#004a99] w-4 text-center">{currentSubImageIndex + 1}</span>
+                <span className="mx-2 text-gray-300">/</span>
+                <span className="text-gray-400 w-4 text-center">{currentItemImages.length}</span>
+              </div>
+
+              <button 
+                onClick={handleNextSubImage}
+                disabled={currentSubImageIndex === currentItemImages.length - 1}
+                className={`p-2 rounded-full text-gray-400 hover:bg-white hover:text-gray-900 transition-all ${currentSubImageIndex === currentItemImages.length - 1 ? 'opacity-20 cursor-not-allowed' : 'active:scale-90 shadow-sm border border-gray-100'}`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
+              </button>
+            </div>
           </div>
-          <p className="mt-4 text-[11px] text-gray-400 font-medium">마우스로 화면을 상하 드래그하여 상세 내용을 확인하세요</p>
         </div>
 
       </div>
