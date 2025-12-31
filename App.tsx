@@ -19,8 +19,8 @@ const INITIAL_CONFIG: SiteConfig = {
   adminPassword: "1234" // 초기 비밀번호
 };
 
-// 비밀번호 강제 초기화를 위한 마스터 키
-const MASTER_RESET_KEY = 'reset';
+// 비밀번호 강제 초기화를 위한 마스터 키 (정확히 입력해야 합니다)
+const MASTER_RESET_KEY = 'HYUNDAI_ADMIN_RESET';
 
 const App: React.FC = () => {
   const [config, setConfig] = useState<SiteConfig>(INITIAL_CONFIG);
@@ -85,16 +85,17 @@ const App: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 마스터 리셋 키 체크
-    if (passwordInput === MASTER_RESET_KEY) {
-      if (window.confirm("마스터 키가 입력되었습니다. 비밀번호를 '1234'로 초기화하시겠습니까?")) {
+    // 마스터 리셋 키 체크 (대소문자 구분 및 공백 제거)
+    if (passwordInput.trim() === MASTER_RESET_KEY) {
+      const confirmReset = window.confirm("마스터 키가 입력되었습니다. 모든 관리자 설정을 유지한 채 비밀번호만 '1234'로 초기화하시겠습니까?");
+      if (confirmReset) {
         const resetConfig = { ...config, adminPassword: '1234' };
         const success = await saveConfig(resetConfig);
         if (success) {
-          alert('비밀번호가 1234로 초기화되었습니다. 다시 로그인해주세요.');
+          alert("비밀번호가 '1234'로 성공적으로 초기화되었습니다. 이제 1234를 입력하여 로그인해주세요.");
           setPasswordInput('');
         } else {
-          alert('초기화 중 오류가 발생했습니다.');
+          alert('초기화 데이터 저장 중 오류가 발생했습니다. DB 연결을 확인해주세요.');
         }
       }
       return;
