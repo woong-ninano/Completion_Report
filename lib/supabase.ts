@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 
 // 실제 서비스 시에는 환경 변수를 사용하세요.
 const supabaseUrl = 'https://msoiyslijsdkdgxfgnms.supabase.co';
-const supabaseAnonKey = 'sb_publishable_9Rggdl0u0SgzgCDgSBRvrA_JKaaL7mh';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zb2l5c2xpanNka2RneGZnbm1zIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcxNDU5MDUsImV4cCI6MjA4MjcyMTkwNX0.B6zhQyp_4FOdcSZgTdrL7xHWOJFk6K3ZjhoytFKIkiw';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
