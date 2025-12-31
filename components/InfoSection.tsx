@@ -20,22 +20,32 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
       const { top, height } = containerRef.current.getBoundingClientRect();
       const windowHeight = window.innerHeight;
       
-      if (top < 0 && Math.abs(top) < height) {
+      // 컨테이너가 화면 상단에 닿았을 때부터 계산 시작
+      if (top <= 0 && Math.abs(top) < height - windowHeight) {
         const totalScrollableHeight = height - windowHeight;
         const progress = Math.abs(top) / totalScrollableHeight;
+        
+        // 정밀한 인덱스 계산
         const index = Math.min(
           Math.floor(progress * items.length),
           items.length - 1
         );
-        setActiveItemIndex(index);
+        
+        if (index !== activeItemIndex) {
+          setActiveItemIndex(index);
+        }
+      } else if (top > 0) {
+        setActiveItemIndex(0);
+      } else {
+        setActiveItemIndex(items.length - 1);
       }
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [items.length]);
+  }, [items.length, activeItemIndex]);
 
-  // 이미지 변경 시 스크롤 위치 초기화
+  // 이미지 변경 시 내부 스크롤 위치 초기화
   useEffect(() => {
     const currentContainer = scrollContainerRefs.current[activeItemIndex];
     if (currentContainer) {
@@ -85,7 +95,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
     const container = scrollContainerRefs.current[activeItemIndex];
     if (!container) return;
     const y = e.pageY - container.offsetTop;
-    const walk = (y - startY) * 1.5; // 스크롤 속도 조절
+    const walk = (y - startY) * 1.5;
     container.scrollTop = scrollTop - walk;
   };
 
@@ -96,7 +106,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
     <div 
       ref={containerRef}
       className="relative w-full"
-      style={{ height: `${items.length * 150}vh` }} // 스크롤 감도를 위해 높이 상향 조정
+      style={{ height: `${items.length * 100}vh` }} // 150vh -> 100vh로 단축하여 반응성 향상
     >
       <div className="sticky top-0 h-screen w-full flex flex-col md:flex-row items-center overflow-hidden max-w-7xl mx-auto px-6">
         
@@ -106,16 +116,16 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
             {items.map((item, idx) => (
               <div
                 key={idx}
-                className={`transition-all duration-1000 ease-in-out w-full md:max-w-[85%] ${
+                className={`transition-all duration-700 ease-out w-full md:max-w-[85%] ${
                   idx === activeItemIndex 
                     ? 'opacity-100 visible translate-y-0 relative' 
-                    : 'opacity-0 invisible absolute top-0 translate-y-10'
+                    : 'opacity-0 invisible absolute top-0 translate-y-8'
                 }`}
               >
-                <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 mb-8 whitespace-pre-line">
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900 mb-6 whitespace-pre-line">
                   {item.title}
                 </h2>
-                <div className="w-12 h-[2px] bg-[#004a99] mb-8"></div>
+                <div className={`w-12 h-[3px] bg-[#004a99] mb-8 transition-all duration-700 delay-100 ${idx === activeItemIndex ? 'w-12 opacity-100' : 'w-0 opacity-0'}`}></div>
                 <p className="text-xl md:text-2xl text-[#666666] leading-relaxed font-light whitespace-pre-line">
                   {item.description}
                 </p>
@@ -124,22 +134,22 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
           </div>
         </div>
 
-        {/* Right side: Device Frame (Centered vertically) */}
+        {/* Right side: Device Frame */}
         <div className="flex-1 w-full md:w-[40%] order-1 md:order-2 flex flex-col items-center justify-center h-full">
-          <div className="flex flex-col items-center w-full mt-16">
+          <div className="flex flex-col items-center w-full mt-12 md:mt-0">
             {/* Device Border */}
-            <div className="relative w-full max-w-[260px] md:max-w-[310px] aspect-[9/19] bg-white rounded-[3rem] p-2 shadow-[0_40px_100px_rgba(0,0,0,0.15)] border-[8px] border-black overflow-hidden transition-transform duration-500">
+            <div className="relative w-full max-w-[240px] md:max-w-[300px] aspect-[9/19] bg-white rounded-[2.5rem] md:rounded-[3rem] p-2 shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden transition-transform duration-500">
               {/* Speaker/Notch */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-6 bg-black rounded-b-2xl z-30"></div>
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-2xl z-30"></div>
               
-              {/* Screen Content Container (Scrollable by Drag) */}
+              {/* Screen Content Container */}
               <div 
                 ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
                 onMouseDown={onMouseDown}
                 onMouseLeave={onMouseLeave}
                 onMouseUp={onMouseUp}
                 onMouseMove={onMouseMove}
-                className={`relative w-full h-full overflow-y-auto rounded-[2.4rem] bg-gray-50 no-scrollbar ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                className={`relative w-full h-full overflow-y-auto rounded-[2rem] md:rounded-[2.4rem] bg-gray-50 no-scrollbar ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                 style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
               >
                 <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
@@ -147,7 +157,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 {items.map((item, itemIdx) => (
                   <div 
                     key={itemIdx}
-                    className={`absolute inset-0 transition-opacity duration-700 ${itemIdx === activeItemIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                    className={`absolute inset-0 transition-opacity duration-500 ${itemIdx === activeItemIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
                   >
                     {item.images.map((img, imgIdx) => (
                       <div
@@ -170,25 +180,25 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
             </div>
 
             {/* Sub-Image Navigation Controls */}
-            <div className="flex items-center gap-6 mt-8 bg-gray-50/50 px-6 py-3 rounded-full border border-gray-100 shadow-sm backdrop-blur-sm">
+            <div className="flex items-center gap-6 mt-8 bg-white/80 px-5 py-2.5 rounded-full border border-gray-100 shadow-sm backdrop-blur-md transition-all hover:shadow-md">
               <button 
                 onClick={handlePrevSubImage}
                 disabled={currentSubImageIndex === 0}
-                className={`p-2 rounded-full text-gray-400 hover:bg-white hover:text-gray-900 transition-all ${currentSubImageIndex === 0 ? 'opacity-20 cursor-not-allowed' : 'active:scale-90 shadow-sm border border-gray-100'}`}
+                className={`p-1.5 rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-all ${currentSubImageIndex === 0 ? 'opacity-10 cursor-not-allowed' : 'active:scale-90'}`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
               </button>
               
-              <div className="text-sm font-bold text-gray-900 tabular-nums flex items-center">
-                <span className="text-[#004a99] w-4 text-center">{currentSubImageIndex + 1}</span>
-                <span className="mx-2 text-gray-300">/</span>
-                <span className="text-gray-400 w-4 text-center">{currentItemImages.length}</span>
+              <div className="text-xs font-bold text-gray-900 tabular-nums flex items-center tracking-tight">
+                <span className="text-[#004a99] w-3 text-center">{currentSubImageIndex + 1}</span>
+                <span className="mx-2 text-gray-200">/</span>
+                <span className="text-gray-400 w-3 text-center">{currentItemImages.length}</span>
               </div>
 
               <button 
                 onClick={handleNextSubImage}
                 disabled={currentSubImageIndex === currentItemImages.length - 1}
-                className={`p-2 rounded-full text-gray-400 hover:bg-white hover:text-gray-900 transition-all ${currentSubImageIndex === currentItemImages.length - 1 ? 'opacity-20 cursor-not-allowed' : 'active:scale-90 shadow-sm border border-gray-100'}`}
+                className={`p-1.5 rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-900 transition-all ${currentSubImageIndex === currentItemImages.length - 1 ? 'opacity-10 cursor-not-allowed' : 'active:scale-90'}`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" /></svg>
               </button>
