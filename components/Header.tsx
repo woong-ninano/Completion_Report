@@ -4,9 +4,10 @@ import React, { useState, useEffect } from 'react';
 interface HeaderProps {
   logoUrl: string;
   projectTitle: string;
+  topText: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ logoUrl, projectTitle }) => {
+const Header: React.FC<HeaderProps> = ({ logoUrl, projectTitle, topText }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [logoError, setLogoError] = useState(false);
 
@@ -41,7 +42,9 @@ const Header: React.FC<HeaderProps> = ({ logoUrl, projectTitle }) => {
 
         {/* Right: Project Title */}
         <div className="hidden md:flex flex-col items-end">
-          <span className="text-[10px] font-bold tracking-[0.2em] text-[#004a99] uppercase opacity-60 mb-0.5">Project Completion Report</span>
+          <span className="text-[10px] font-bold tracking-[0.2em] text-[#004a99] uppercase opacity-60 mb-0.5">
+            {topText || "Project Completion Report"}
+          </span>
           <span className={`text-sm lg:text-base font-bold transition-colors duration-500 ${isScrolled ? 'text-gray-900' : 'text-gray-800'}`}>
             {projectTitle}
           </span>

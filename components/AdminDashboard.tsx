@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { SiteConfig, ContentItem } from '../types';
+import { uploadImage } from '../lib/supabase';
 
 interface AdminDashboardProps {
   config: SiteConfig;
@@ -10,10 +11,34 @@ interface AdminDashboardProps {
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogout }) => {
   const [editConfig, setEditConfig] = useState<SiteConfig>(config);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setEditConfig(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, type: 'logo' | 'itemImage', itemIdx?: number, imgIdx?: number) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      const publicUrl = await uploadImage(file);
+      
+      if (type === 'logo') {
+        setEditConfig(prev => ({ ...prev, headerLogoUrl: publicUrl }));
+      } else if (type === 'itemImage' && itemIdx !== undefined && imgIdx !== undefined) {
+        const newItems = [...editConfig.contentItems];
+        newItems[itemIdx].images[imgIdx] = publicUrl;
+        setEditConfig(prev => ({ ...prev, contentItems: newItems }));
+      }
+    } catch (error) {
+      console.error('File upload failed:', error);
+      alert('파일 업로드 중 오류가 발생했습니다.');
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleItemChange = (index: number, field: keyof ContentItem, value: any) => {
@@ -33,14 +58,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
   };
 
   const removeItem = (index: number) => {
-    const newItems = editConfig.contentItems.filter((_, i) => i !== index);
-    setEditConfig(prev => ({ ...prev, contentItems: newItems }));
-  };
-
-  const handleImageChange = (itemIdx: number, imgIdx: number, value: string) => {
-    const newItems = [...editConfig.contentItems];
-    newItems[itemIdx].images[imgIdx] = value;
-    setEditConfig(prev => ({ ...prev, contentItems: newItems }));
+    if (window.confirm("정말 이 섹션을 삭제하시겠습니까?")) {
+      const newItems = editConfig.contentItems.filter((_, i) => i !== index);
+      setEditConfig(prev => ({ ...prev, contentItems: newItems }));
+    }
   };
 
   const addImageField = (itemIdx: number) => {
@@ -49,95 +70,143 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
     setEditConfig(prev => ({ ...prev, contentItems: newItems }));
   };
 
+  const removeImageField = (itemIdx: number, imgIdx: number) => {
+    const newItems = [...editConfig.contentItems];
+    newItems[itemIdx].images = newItems[itemIdx].images.filter((_, i) => i !== imgIdx);
+    setEditConfig(prev => ({ ...prev, contentItems: newItems }));
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-24 pb-12 px-6">
+    <div className="min-h-screen bg-gray-50 pt-12 pb-24 px-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-10">
-          <h1 className="text-3xl font-bold text-gray-900">시스템 관리자</h1>
+        {/* Top Sticky Bar */}
+        <div className="sticky top-0 z-50 flex justify-between items-center mb-10 py-4 bg-gray-50/80 backdrop-blur-md">
+          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+            <span className="text-[#004a99]">시스템</span> 관리자
+            {isUploading && <span className="text-xs font-normal text-blue-500 animate-pulse">파일 업로드 중...</span>}
+          </h1>
           <div className="flex gap-4">
-            <button onClick={onLogout} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">로그아웃</button>
-            <button onClick={() => onSave(editConfig)} className="px-6 py-2 bg-[#004a99] text-white font-bold rounded-lg hover:bg-blue-800 transition-colors shadow-lg">설정 저장하기</button>
+            <button onClick={() => window.location.hash = ''} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">홈으로</button>
+            <button onClick={onLogout} className="px-4 py-2 text-sm text-red-500 hover:text-red-700 transition-colors">로그아웃</button>
+            <button 
+              disabled={isUploading}
+              onClick={() => onSave(editConfig)} 
+              className={`px-8 py-2 bg-[#004a99] text-white font-bold rounded-xl hover:bg-blue-800 transition-all shadow-lg hover:shadow-blue-200/50 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              설정 저장하기
+            </button>
           </div>
         </div>
 
         {/* Basic Info Card */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 mb-8">
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> 상단 및 히어로 섹션
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
+          <h2 className="text-xl font-bold mb-8 flex items-center gap-2">
+            <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> 헤더 및 히어로 설정
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-gray-600">로고 이미지 URL</label>
-              <input name="headerLogoUrl" value={editConfig.headerLogoUrl} onChange={handleInputChange} className="border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="flex flex-col gap-3">
+              <label className="text-sm font-bold text-gray-600">로고 이미지 등록</label>
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-gray-50 rounded-lg flex items-center justify-center border border-dashed border-gray-200 overflow-hidden">
+                  {editConfig.headerLogoUrl ? (
+                    <img src={editConfig.headerLogoUrl} className="w-full h-full object-contain p-1" />
+                  ) : (
+                    <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 002-2H4a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  )}
+                </div>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={(e) => handleFileUpload(e, 'logo')} 
+                  className="text-xs file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                />
+              </div>
             </div>
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-gray-600">우측 상단 프로젝트명</label>
-              <input name="headerProjectTitle" value={editConfig.headerProjectTitle} onChange={handleInputChange} className="border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500" />
+            <div className="flex flex-col gap-3">
+              <label className="text-sm font-bold text-gray-600">우측 상단 서브 타이틀</label>
+              <input name="headerTopText" value={editConfig.headerTopText} onChange={handleInputChange} placeholder="Project Completion Report" className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
+              <label className="text-sm font-bold text-gray-600">메인 프로젝트명</label>
+              <input name="headerProjectTitle" value={editConfig.headerProjectTitle} onChange={handleInputChange} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
+            </div>
+            <div className="flex flex-col gap-3">
               <label className="text-sm font-bold text-gray-600">히어로 뱃지 텍스트</label>
-              <input name="heroBadge" value={editConfig.heroBadge} onChange={handleInputChange} className="border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500" />
+              <input name="heroBadge" value={editConfig.heroBadge} onChange={handleInputChange} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" />
             </div>
-            <div className="flex flex-col gap-2 md:col-span-2">
+            <div className="flex flex-col gap-3 md:col-span-2">
               <label className="text-sm font-bold text-gray-600">히어로 타이틀 (줄바꿈 \n 사용)</label>
-              <input name="heroTitle1" value={editConfig.heroTitle1} onChange={handleInputChange} className="border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500 font-bold" />
-            </div>
-            <div className="flex flex-col gap-2 md:col-span-2">
-              <label className="text-sm font-bold text-gray-600">히어로 설명문 1</label>
-              <textarea name="heroDesc1" value={editConfig.heroDesc1} onChange={handleInputChange} className="border border-gray-200 rounded-lg px-4 py-2 h-20 outline-none focus:border-blue-500 resize-none" />
+              <textarea name="heroTitle1" value={editConfig.heroTitle1} onChange={handleInputChange} rows={2} className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all font-bold resize-none" />
             </div>
           </div>
         </div>
 
         {/* Content Items Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
-          <div className="flex justify-between items-center mb-8">
+        <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
+          <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-bold flex items-center gap-2">
-              <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div> 컨텐츠 섹션 관리
+              <div className="w-1.5 h-6 bg-orange-500 rounded-full"></div> 상세 컨텐츠 섹션
             </h2>
-            <button onClick={addItem} className="px-4 py-2 bg-orange-50 text-orange-600 font-bold rounded-lg hover:bg-orange-100 transition-colors text-sm">+ 섹션 추가</button>
+            <button onClick={addItem} className="px-6 py-2 bg-orange-50 text-orange-600 font-bold rounded-xl hover:bg-orange-100 transition-all text-sm">+ 섹션 추가</button>
           </div>
 
-          <div className="space-y-12">
+          <div className="space-y-16">
             {editConfig.contentItems.map((item, idx) => (
-              <div key={idx} className="p-6 bg-gray-50 rounded-xl relative group border border-transparent hover:border-gray-200 transition-all">
-                <button onClick={() => removeItem(idx)} className="absolute top-4 right-4 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity">삭제</button>
-                <div className="flex flex-col gap-4">
-                  <div className="grid grid-cols-1 gap-4">
-                    <input 
-                      value={item.title} 
-                      placeholder="섹션 타이틀 (줄바꿈 \n 가능)" 
-                      onChange={(e) => handleItemChange(idx, 'title', e.target.value)} 
-                      className="text-lg font-bold bg-white border border-gray-200 rounded-lg px-4 py-2 outline-none focus:border-blue-500" 
-                    />
-                    <textarea 
-                      value={item.description} 
-                      placeholder="주요 설명" 
-                      onChange={(e) => handleItemChange(idx, 'description', e.target.value)} 
-                      className="bg-white border border-gray-200 rounded-lg px-4 py-2 h-24 outline-none focus:border-blue-500 resize-none" 
-                    />
-                    <textarea 
-                      value={item.subDescription || ''} 
-                      placeholder="보조 설명 (선택사항)" 
-                      onChange={(e) => handleItemChange(idx, 'subDescription', e.target.value)} 
-                      className="bg-white border border-gray-200 rounded-lg px-4 py-2 h-20 outline-none focus:border-blue-500 resize-none text-sm" 
-                    />
+              <div key={idx} className="p-8 bg-gray-50 rounded-2xl relative group border border-transparent hover:border-gray-200 transition-all">
+                <button onClick={() => removeItem(idx)} className="absolute top-6 right-6 text-gray-400 hover:text-red-500 transition-colors">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                </button>
+                <div className="flex flex-col gap-6">
+                  <div className="grid grid-cols-1 gap-6">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">타이틀</label>
+                      <input 
+                        value={item.title} 
+                        onChange={(e) => handleItemChange(idx, 'title', e.target.value)} 
+                        className="text-xl font-bold bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" 
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">상세 설명</label>
+                      <textarea 
+                        value={item.description} 
+                        onChange={(e) => handleItemChange(idx, 'description', e.target.value)} 
+                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 h-28 outline-none focus:border-blue-500 resize-none transition-all leading-relaxed" 
+                      />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">보조 설명 (선택)</label>
+                      <textarea 
+                        value={item.subDescription || ''} 
+                        onChange={(e) => handleItemChange(idx, 'subDescription', e.target.value)} 
+                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 h-20 outline-none focus:border-blue-500 resize-none text-sm transition-all" 
+                      />
+                    </div>
                   </div>
                   
-                  <div className="flex flex-col gap-3">
-                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">이미지 리스트</label>
-                    <div className="grid grid-cols-1 gap-2">
+                  <div className="flex flex-col gap-4">
+                    <div className="flex justify-between items-center">
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">디바이스 이미지 (업로드)</label>
+                      <button onClick={() => addImageField(idx)} className="text-xs text-[#004a99] font-bold hover:underline">+ 이미지 추가</button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {item.images.map((img, imgIdx) => (
-                        <div key={imgIdx} className="flex gap-2">
+                        <div key={imgIdx} className="bg-white p-4 rounded-xl border border-gray-100 shadow-sm flex flex-col gap-3">
+                          <div className="flex justify-between items-center">
+                            <span className="text-[10px] font-bold text-gray-300">이미지 #{imgIdx + 1}</span>
+                            <button onClick={() => removeImageField(idx, imgIdx)} className="text-gray-300 hover:text-red-500">
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                            </button>
+                          </div>
+                          {img && <img src={img} className="h-32 w-full object-contain bg-gray-50 rounded-lg mb-2" />}
                           <input 
-                            value={img} 
-                            placeholder={`이미지 URL ${imgIdx + 1}`}
-                            onChange={(e) => handleImageChange(idx, imgIdx, e.target.value)}
-                            className="flex-1 text-xs border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:border-blue-500" 
+                            type="file" 
+                            accept="image/*" 
+                            onChange={(e) => handleFileUpload(e, 'itemImage', idx, imgIdx)}
+                            className="text-[10px] file:mr-2 file:py-1.5 file:px-3 file:rounded-md file:border-0 file:text-[10px] file:font-bold file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200"
                           />
                         </div>
                       ))}
-                      <button onClick={() => addImageField(idx)} className="text-xs text-blue-500 font-bold hover:underline self-start">+ 이미지 추가</button>
                     </div>
                   </div>
                 </div>

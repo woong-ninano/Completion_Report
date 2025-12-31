@@ -10,6 +10,7 @@ export interface ContentItem {
 export interface SiteConfig {
   headerLogoUrl: string;
   headerProjectTitle: string;
+  headerTopText: string; // 새로 추가: 우측 상단 소제목
   heroBadge: string;
   heroTitle1: string;
   heroTitle2: string;
