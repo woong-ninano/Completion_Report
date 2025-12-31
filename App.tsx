@@ -16,10 +16,10 @@ const INITIAL_CONFIG: SiteConfig = {
   heroDesc1: "보험의 본질은 지키고,",
   heroDesc2: "경험의 가치는 새롭게 정의하다.",
   contentItems: [],
-  adminPassword: "1234" // 초기 비밀번호
+  adminPassword: "1234"
 };
 
-// 비밀번호 강제 초기화를 위한 마스터 키 (정확히 입력해야 합니다)
+// 마스터 리셋 키: HYUNDAI_ADMIN_RESET (정확히 입력 후 '접속하기' 클릭)
 const MASTER_RESET_KEY = 'HYUNDAI_ADMIN_RESET';
 
 const App: React.FC = () => {
@@ -85,24 +85,26 @@ const App: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 마스터 리셋 키 체크 (대소문자 구분 및 공백 제거)
-    if (passwordInput.trim() === MASTER_RESET_KEY) {
-      const confirmReset = window.confirm("마스터 키가 입력되었습니다. 모든 관리자 설정을 유지한 채 비밀번호만 '1234'로 초기화하시겠습니까?");
+    const input = passwordInput.trim();
+    
+    // 마스터 리셋 키 체크 (대소문자 무시)
+    if (input.toUpperCase() === MASTER_RESET_KEY) {
+      const confirmReset = window.confirm("비상용 초기화 키가 감지되었습니다. 비밀번호를 '1234'로 리셋하시겠습니까?");
       if (confirmReset) {
         const resetConfig = { ...config, adminPassword: '1234' };
         const success = await saveConfig(resetConfig);
         if (success) {
-          alert("비밀번호가 '1234'로 성공적으로 초기화되었습니다. 이제 1234를 입력하여 로그인해주세요.");
+          alert("비밀번호가 '1234'로 초기화되었습니다. 이제 1234를 입력하여 접속하세요.");
           setPasswordInput('');
         } else {
-          alert('초기화 데이터 저장 중 오류가 발생했습니다. DB 연결을 확인해주세요.');
+          alert('저장 실패: 네트워크 상태를 확인해주세요.');
         }
       }
       return;
     }
 
     const currentPassword = config.adminPassword || '1234';
-    if (passwordInput === currentPassword) {
+    if (input === currentPassword) {
       setIsLoggedIn(true);
       sessionStorage.setItem('admin_auth', 'true');
       setPasswordInput('');
@@ -130,7 +132,7 @@ const App: React.FC = () => {
       <div className="h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-sm font-bold text-gray-400">데이터를 불러오는 중입니다...</p>
+          <p className="text-sm font-bold text-gray-400">데이터 로딩 중...</p>
         </div>
       </div>
     );

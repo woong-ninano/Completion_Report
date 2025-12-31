@@ -116,13 +116,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
               )}
             </h1>
             <div className="flex gap-3">
-              <button 
-                onClick={() => setShowPwdChange(!showPwdChange)} 
-                className={`px-4 py-2 text-sm font-medium rounded-xl border transition-all ${showPwdChange ? 'bg-gray-200 border-gray-300' : 'bg-white border-gray-200 text-gray-600 hover:bg-gray-50'}`}
-              >
-                비밀번호 변경
-              </button>
-              <button onClick={onLogout} className="px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 rounded-xl transition-all">로그아웃</button>
+              <button onClick={onLogout} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">로그아웃</button>
               <button 
                 disabled={isUploading}
                 onClick={() => onSave(editConfig)} 
@@ -133,27 +127,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
             </div>
           </div>
 
-          {/* Password Change Sub-panel */}
+          {/* Hidden Password Change Sub-panel */}
           {showPwdChange && (
-            <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200 flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
+            <div className="bg-orange-50 p-6 rounded-2xl shadow-sm border border-orange-100 flex items-center justify-between animate-in slide-in-from-top-2 duration-300">
               <div className="flex items-center gap-4 flex-1">
-                <span className="text-sm font-bold text-gray-700">새 비밀번호:</span>
+                <span className="text-sm font-bold text-orange-900">새 비밀번호:</span>
                 <input 
                   type="text"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="새로운 비밀번호 입력"
-                  className="flex-1 max-w-xs border border-gray-200 rounded-lg px-3 py-1.5 outline-none focus:border-blue-500 text-sm"
+                  className="flex-1 max-w-xs border border-orange-200 rounded-lg px-4 py-2 outline-none focus:border-orange-500 text-sm"
                 />
                 <button 
                   onClick={changePassword}
-                  className="bg-gray-900 text-white px-4 py-1.5 rounded-lg text-sm font-bold hover:bg-black transition-colors"
+                  className="bg-orange-600 text-white px-6 py-2 rounded-lg text-sm font-bold hover:bg-orange-700 transition-colors shadow-sm"
                 >
                   변경 확인
                 </button>
               </div>
-              <button onClick={() => setShowPwdChange(false)} className="text-gray-400 p-1 hover:text-gray-600">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+              <button onClick={() => setShowPwdChange(false)} className="text-orange-400 p-2 hover:text-orange-600">
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
               </button>
             </div>
           )}
@@ -165,10 +159,10 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           </div>
           <div>
-            <h4 className="text-sm font-bold text-blue-900 mb-1">관리자 팁</h4>
+            <h4 className="text-sm font-bold text-blue-900 mb-1">관리자 안내</h4>
             <p className="text-xs text-blue-700 leading-relaxed">
-              섹션별로 구분하기 쉽게 <strong>넘버링(섹션 01...)</strong>을 추가했습니다. 
-              비밀번호 변경 후에는 반드시 <strong>[설정 저장하기]</strong>를 눌러야 클라우드 DB에 동기화됩니다.
+              섹션별 넘버링(Section 01...)이 추가되어 구분이 쉬워졌습니다. 
+              내용 수정 후 상단의 <strong>[설정 저장하기]</strong>를 눌러야 클라우드에 최종 반영됩니다.
             </p>
           </div>
         </div>
@@ -228,7 +222,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
           <div className="space-y-12">
             {editConfig.contentItems.map((item, idx) => (
               <div key={idx} className="p-8 bg-gray-50 rounded-2xl relative group border border-gray-100 hover:border-blue-200 transition-all">
-                {/* Section Number Badge */}
                 <div className="absolute -top-3 left-6 px-4 py-1.5 bg-[#004a99] text-white text-[10px] font-black rounded-full shadow-lg z-10 tracking-widest uppercase">
                   Section {(idx + 1).toString().padStart(2, '0')}
                 </div>
@@ -303,12 +296,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
               </div>
             ))}
           </div>
-          
-          {editConfig.contentItems.length === 0 && (
-            <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-              <p className="text-gray-400 text-sm">등록된 섹션이 없습니다. 상단의 버튼을 눌러 추가해주세요.</p>
-            </div>
-          )}
+        </div>
+
+        {/* Hidden Area for Password Change */}
+        <div className="mt-20 flex justify-center opacity-0 hover:opacity-100 transition-opacity">
+          <button 
+            onClick={() => setShowPwdChange(!showPwdChange)}
+            className="text-[10px] text-gray-300 underline decoration-dotted font-bold px-4 py-2"
+          >
+            ADMIN_SECURITY_SETTINGS
+          </button>
         </div>
       </div>
     </div>
