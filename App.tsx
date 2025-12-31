@@ -20,7 +20,7 @@ const INITIAL_CONFIG: SiteConfig = {
 };
 
 // 마스터 리셋 키: HYUNDAI_ADMIN_RESET (정확히 입력 후 '접속하기' 클릭)
-const MASTER_RESET_KEY = 'HYUNDAI_ADMIN_RESET';
+const MASTER_RESET_KEY = 'reset';
 
 const App: React.FC = () => {
   const [config, setConfig] = useState<SiteConfig>(INITIAL_CONFIG);
