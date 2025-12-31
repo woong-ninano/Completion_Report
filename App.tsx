@@ -183,7 +183,7 @@ const App: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 text-center z-10">
           <div className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-[#004a99] uppercase bg-blue-50 rounded-full">{config.heroBadge}</div>
           <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-8 leading-[1.1] tracking-tight whitespace-pre-line">{config.heroTitle1}</h1>
-          <p className="max-w-2xl mx-auto text-xl md:text-2xl text-gray-400 font-light leading-relaxed whitespace-pre-line">{config.heroTitle2}</p>
+          <p className="max-w-2xl mx-auto text-xl md:text-2xl text-gray-900 font-light leading-relaxed whitespace-pre-line">{config.heroTitle2}</p>
           <div className="mt-12 animate-bounce flex justify-center opacity-30">
             <svg className="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 14l-7 7-7-7m14-8l-7 7-7-7" /></svg>
           </div>
