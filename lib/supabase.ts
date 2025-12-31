@@ -16,17 +16,27 @@ export const uploadImage = async (file: File): Promise<string> => {
   const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
   const filePath = `uploads/${fileName}`;
 
-  const { error: uploadError } = await supabase.storage
+  // 업로드 시도
+  const { data: uploadData, error: uploadError } = await supabase.storage
     .from('report-assets')
-    .upload(filePath, file);
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
 
   if (uploadError) {
-    throw uploadError;
+    console.error('Supabase Storage Upload Error Detail:', uploadError);
+    throw new Error(`Upload failed: ${uploadError.message}`);
   }
 
+  // 공용 URL 가져오기
   const { data } = supabase.storage
     .from('report-assets')
     .getPublicUrl(filePath);
+
+  if (!data?.publicUrl) {
+    throw new Error('Failed to get public URL');
+  }
 
   return data.publicUrl;
 };

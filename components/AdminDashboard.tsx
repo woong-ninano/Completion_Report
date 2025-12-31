@@ -22,6 +22,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 10 * 1024 * 1024) {
+      alert('파일 크기가 너무 큽니다. (최대 10MB)');
+      return;
+    }
+
     try {
       setIsUploading(true);
       const publicUrl = await uploadImage(file);
@@ -33,11 +38,22 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
         newItems[itemIdx].images[imgIdx] = publicUrl;
         setEditConfig(prev => ({ ...prev, contentItems: newItems }));
       }
-    } catch (error) {
-      console.error('File upload failed:', error);
-      alert('파일 업로드 중 오류가 발생했습니다.');
+    } catch (error: any) {
+      console.error('Detailed Upload Error:', error);
+      
+      let errorMsg = '파일 업로드 중 오류가 발생했습니다.';
+      if (error.message?.includes('RLS')) {
+        errorMsg += '\n\n[권한 오류 발생]\nSupabase Storage의 Policies 설정에서 INSERT(업로드) 권한이 "true" 또는 "bucket_id = \'report-assets\'"로 설정되어 있는지 확인해주세요.';
+      } else if (error.message?.includes('Bucket not found')) {
+        errorMsg += '\n\n[버킷 없음]\nSupabase Storage에 "report-assets"라는 이름의 버킷이 생성되어 있는지 확인해주세요.';
+      } else {
+        errorMsg += `\n원인: ${error.message}`;
+      }
+      
+      alert(errorMsg);
     } finally {
       setIsUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -52,7 +68,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
       ...prev,
       contentItems: [
         ...prev.contentItems,
-        { title: '새 섹션 타이틀', description: '내용을 입력하세요.', images: [] }
+        { title: '새 섹션 타이틀', description: '내용을 입력하세요.', images: [""] }
       ]
     }));
   };
@@ -79,11 +95,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
   return (
     <div className="min-h-screen bg-gray-50 pt-12 pb-24 px-6 overflow-y-auto">
       <div className="max-w-4xl mx-auto">
-        {/* Top Sticky Bar */}
         <div className="sticky top-0 z-50 flex justify-between items-center mb-10 py-4 bg-gray-50/80 backdrop-blur-md">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
             <span className="text-[#004a99]">시스템</span> 관리자
-            {isUploading && <span className="text-xs font-normal text-blue-500 animate-pulse">파일 업로드 중...</span>}
+            {isUploading && (
+              <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full">
+                <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
+                <span className="text-xs font-bold text-blue-500">UPLOAD ACTIVE</span>
+              </div>
+            )}
           </h1>
           <div className="flex gap-4">
             <button onClick={() => window.location.hash = ''} className="px-4 py-2 text-sm text-gray-500 hover:text-gray-900 transition-colors">홈으로</button>
@@ -98,7 +118,19 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
           </div>
         </div>
 
-        {/* Basic Info Card */}
+        <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 mb-8 flex gap-4 items-start">
+          <div className="bg-blue-500 text-white p-2 rounded-lg">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-blue-900 mb-1">업로드 오류가 발생하나요?</h4>
+            <p className="text-xs text-blue-700 leading-relaxed">
+              Supabase Storage 설정에서 <code className="bg-blue-100 px-1 rounded font-bold">report-assets</code> 버킷이 <strong>Public</strong>으로 생성되어 있어야 하며, 
+              <strong>Policies</strong>에서 <code className="bg-blue-100 px-1 rounded font-bold">INSERT</code> 권한의 조건이 <code className="bg-blue-100 px-1 rounded font-bold">true</code>로 설정되어 있어야 합니다.
+            </p>
+          </div>
+        </div>
+
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 mb-8">
           <h2 className="text-xl font-bold mb-8 flex items-center gap-2">
             <div className="w-1.5 h-6 bg-blue-600 rounded-full"></div> 헤더 및 히어로 설정
@@ -141,7 +173,6 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
           </div>
         </div>
 
-        {/* Content Items Section */}
         <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8">
           <div className="flex justify-between items-center mb-10">
             <h2 className="text-xl font-bold flex items-center gap-2">
