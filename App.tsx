@@ -163,7 +163,7 @@ const App: React.FC = () => {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-[1.2] md:leading-[1.1] tracking-tight whitespace-pre-line">
             {config.heroTitle1}
           </h1>
-          <p className="max-w-2xl mx-auto text-lg md:text-2xl text-gray-950 font-light leading-relaxed whitespace-pre-line">
+          <p className="max-w-2xl mx-auto text-lg md:text-2xl text-gray-900 font-normal leading-relaxed whitespace-pre-line">
             {config.heroTitle2}
           </p>
           <div className="mt-16 animate-bounce flex justify-center opacity-20">

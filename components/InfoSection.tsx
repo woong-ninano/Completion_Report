@@ -97,11 +97,11 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
           <div key={idx} className="px-6 py-12 border-b border-gray-50 last:border-0 flex flex-col gap-8">
             <div className="w-full">
               <div className="text-[#004a99] font-black text-[10px] tracking-widest uppercase mb-2">Section {(idx + 1).toString().padStart(2, '0')}</div>
-              <h2 className="text-2xl font-bold text-gray-900 leading-tight mb-4 whitespace-pre-line">
+              <h2 className="text-2xl font-bold text-gray-900 leading-tight mb-4 whitespace-pre-line">           
                 {item.title}
               </h2>
               <div className="w-8 h-[2px] bg-[#004a99] mb-4"></div>
-              <p className="text-base text-[#666666] leading-relaxed font-light whitespace-pre-line">
+              <p className="text-base text-[#666666] leading-relaxed font-normal whitespace-pre-line">
                 {item.description}
               </p>
             </div>
@@ -172,7 +172,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                     {item.title}
                   </h2>
                   <div className={`w-12 h-[3px] bg-[#004a99] mb-8 transition-all duration-700 delay-100 ${idx === activeItemIndex ? 'w-12 opacity-100' : 'w-0 opacity-0'}`}></div>
-                  <p className="text-2xl text-[#666666] leading-relaxed font-light whitespace-pre-line">
+                  <p className="text-2xl text-gray-900 leading-relaxed font-normal whitespace-pre-line">
                     {item.description}
                   </p>
                 </div>
