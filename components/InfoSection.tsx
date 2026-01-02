@@ -93,7 +93,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
 
   return (
     <div className="w-full">
-      {/* --- 모바일 레이아웃 (768px 미만): 스크롤리텔링 제거 및 순차 나열 --- */}
+      {/* --- 모바일 레이아웃 (768px 미만) --- */}
       <div className="block md:hidden bg-white w-full">
         {items.map((item, idx) => (
           <div key={idx} className="px-6 py-12 border-b border-gray-50 last:border-0 flex flex-col gap-8">
@@ -109,24 +109,22 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
               </p>
             </div>
 
-            {/* 이미지 영역: 프레임 테두리에 완전 밀착 */}
+            {/* 이미지 영역 */}
             <div className="flex flex-col items-center w-full">
               <div className="relative w-full max-w-[260px] aspect-[9/19] bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.08)] border-[6px] border-black overflow-hidden flex flex-col">
-                {/* Notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-b-2xl z-40"></div>
-                
-                {/* Status Bar (Fixed at Top) */}
                 <div className="relative z-30 w-full shrink-0">
                   <img src={STATUS_BAR_URL} alt="status bar" className="w-full h-auto block bg-white" />
                 </div>
 
-                {/* Screen Content */}
                 <div className="relative flex-1 w-full bg-gray-50 overflow-hidden">
                    {item.images.map((img, imgIdx) => (
                       <div
                         key={imgIdx}
-                        className={`absolute inset-0 w-full transition-all duration-500 ${
-                          imgIdx === subImageIndices[idx] ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                        className={`absolute inset-0 w-full transform transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) ${
+                          imgIdx === subImageIndices[idx] 
+                            ? 'opacity-100 scale-100 translate-y-0 z-10' 
+                            : 'opacity-0 scale-95 translate-y-2 z-0 pointer-events-none'
                         }`}
                       >
                         <img 
@@ -139,7 +137,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 </div>
               </div>
               
-              {/* 이미지 전환 페이징 버튼 */}
               {item.images.length > 1 && (
                 <div className="flex items-center gap-6 mt-6 bg-gray-50/80 px-4 py-2 rounded-full border border-gray-100">
                   <button onClick={(e) => handlePrevSubImage(e, idx)} disabled={subImageIndices[idx] === 0} className="p-1 disabled:opacity-10">
@@ -156,7 +153,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
         ))}
       </div>
 
-      {/* --- 데스크톱 레이아웃 (768px 이상): 기존 스크롤리텔링 유지 --- */}
+      {/* --- 데스크톱 레이아웃 (768px 이상) --- */}
       <div 
         ref={containerRef}
         className="hidden md:block relative w-full"
@@ -188,13 +185,10 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
           </div>
 
           <div className="flex-1 w-[40%] flex flex-col items-center justify-center h-full">
-            {/* 우측 이미지 영역을 54px 아래로 정렬 */}
             <div className="flex flex-col items-center w-full transform translate-y-[54px]">
-              {/* PC 폰 프레임 */}
               <div className="relative w-full max-w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden flex flex-col">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-40"></div>
                 
-                {/* 폰 화면 내부 컨테이너 */}
                 <div 
                   ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
                   onMouseDown={(e) => onMouseDown(e, activeItemIndex)}
@@ -206,7 +200,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 >
                   <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
                   
-                  {/* Status Bar (Sticky at Top) */}
                   <div className="sticky top-0 z-30 w-full bg-white shrink-0">
                     <img src={STATUS_BAR_URL} alt="status bar" className="w-full h-auto block" draggable={false} />
                   </div>
@@ -219,8 +212,10 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                       {item.images.map((img, imgIdx) => (
                         <div
                           key={imgIdx}
-                          className={`w-full transition-opacity duration-500 ${
-                            imgIdx === subImageIndices[itemIdx] ? 'block opacity-100' : 'hidden opacity-0'
+                          className={`w-full transform transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) ${
+                            imgIdx === subImageIndices[itemIdx] 
+                              ? 'block opacity-100 scale-100 translate-y-0' 
+                              : 'hidden opacity-0 scale-95 translate-y-2'
                           }`}
                         >
                           <img 
@@ -237,7 +232,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 </div>
               </div>
 
-              {/* 하단 페이징 컨트롤 */}
               <div className="flex items-center gap-6 mt-8 bg-white/80 px-5 py-2.5 rounded-full border border-gray-100 shadow-sm backdrop-blur-md">
                 <button onClick={(e) => handlePrevSubImage(e, activeItemIndex)} disabled={subImageIndices[activeItemIndex] === 0} className="p-1.5 rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-10 transition-all">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
