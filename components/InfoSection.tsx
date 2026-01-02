@@ -52,7 +52,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
       next[idx] = Math.max(0, next[idx] - 1);
       return next;
     });
-    // 이미지 변경 시 스크롤 상단으로 초기화
     if (scrollContainerRefs.current[idx]) {
       scrollContainerRefs.current[idx]!.scrollTop = 0;
     }
@@ -66,7 +65,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
       next[idx] = Math.min(maxIdx, next[idx] + 1);
       return next;
     });
-    // 이미지 변경 시 스크롤 상단으로 초기화
     if (scrollContainerRefs.current[idx]) {
       scrollContainerRefs.current[idx]!.scrollTop = 0;
     }
@@ -93,11 +91,10 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
 
   return (
     <div className="w-full">
-      {/* --- 모바일 레이아웃 (768px 미만) --- */}
+      {/* --- 모바일 레이아웃 --- */}
       <div className="block md:hidden bg-white w-full">
         {items.map((item, idx) => (
           <div key={idx} className="px-6 py-12 border-b border-gray-50 last:border-0 flex flex-col gap-8">
-            {/* 문구 영역 */}
             <div className="w-full">
               <div className="text-[#004a99] font-black text-[10px] tracking-widest uppercase mb-2">Section {(idx + 1).toString().padStart(2, '0')}</div>
               <h2 className="text-2xl font-bold text-gray-900 leading-tight mb-4 whitespace-pre-line">
@@ -109,7 +106,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
               </p>
             </div>
 
-            {/* 이미지 영역 */}
             <div className="flex flex-col items-center w-full">
               <div className="relative w-full max-w-[260px] aspect-[9/19] bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.08)] border-[6px] border-black overflow-hidden flex flex-col">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-b-2xl z-40"></div>
@@ -121,10 +117,10 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                    {item.images.map((img, imgIdx) => (
                       <div
                         key={imgIdx}
-                        className={`absolute inset-0 w-full transform transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) ${
+                        className={`absolute inset-0 w-full transform transition-all duration-700 ease-in-out ${
                           imgIdx === subImageIndices[idx] 
-                            ? 'opacity-100 scale-100 translate-y-0 z-10' 
-                            : 'opacity-0 scale-95 translate-y-2 z-0 pointer-events-none'
+                            ? 'opacity-100 scale-100 z-10' 
+                            : 'opacity-0 scale-105 z-0 pointer-events-none'
                         }`}
                       >
                         <img 
@@ -153,7 +149,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
         ))}
       </div>
 
-      {/* --- 데스크톱 레이아웃 (768px 이상) --- */}
+      {/* --- 데스크톱 레이아웃 --- */}
       <div 
         ref={containerRef}
         className="hidden md:block relative w-full"
@@ -165,10 +161,10 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
               {items.map((item, idx) => (
                 <div
                   key={idx}
-                  className={`transition-all duration-700 ease-out w-full max-w-[85%] ${
+                  className={`transition-all duration-1000 cubic-bezier(0.4, 0, 0.2, 1) w-full max-w-[85%] ${
                     idx === activeItemIndex 
-                      ? 'opacity-100 visible translate-y-0 relative' 
-                      : 'opacity-0 invisible absolute top-0 translate-y-8'
+                      ? 'opacity-100 visible translate-y-0 relative z-10' 
+                      : 'opacity-0 invisible absolute top-0 translate-y-12 z-0'
                   }`}
                 >
                   <div className="text-[#004a99] font-black text-[10px] tracking-widest uppercase mb-4">Section {(idx + 1).toString().padStart(2, '0')}</div>
@@ -187,35 +183,37 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
           <div className="flex-1 w-[40%] flex flex-col items-center justify-center h-full">
             <div className="flex flex-col items-center w-full transform translate-y-[54px]">
               <div className="relative w-full max-w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden flex flex-col">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-40"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-50"></div>
                 
-                <div 
-                  ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
-                  onMouseDown={(e) => onMouseDown(e, activeItemIndex)}
-                  onMouseLeave={() => setIsDragging(false)}
-                  onMouseUp={() => setIsDragging(false)}
-                  onMouseMove={(e) => onMouseMove(e, activeItemIndex)}
-                  className={`relative w-full h-full overflow-y-auto bg-gray-50 no-scrollbar ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-                  style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
-                >
-                  <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
-                  
-                  <div className="sticky top-0 z-30 w-full bg-white shrink-0">
-                    <img src={STATUS_BAR_URL} alt="status bar" className="w-full h-auto block" draggable={false} />
-                  </div>
+                {/* 상단 상태바 고정 */}
+                <div className="relative z-40 w-full bg-white shrink-0">
+                  <img src={STATUS_BAR_URL} alt="status bar" className="w-full h-auto block" draggable={false} />
+                </div>
 
+                {/* 폰 화면 내부 컨테이너: 모든 섹션 이미지를 절대 위치로 겹쳐서 페이드 처리 */}
+                <div className="relative flex-1 w-full bg-gray-50 overflow-hidden">
                   {items.map((item, itemIdx) => (
                     <div 
                       key={itemIdx}
-                      className={`${itemIdx === activeItemIndex ? 'block relative' : 'hidden absolute'}`}
+                      ref={(el) => { if (itemIdx === activeItemIndex) scrollContainerRefs.current[itemIdx] = el; }}
+                      onMouseDown={(e) => onMouseDown(e, itemIdx)}
+                      onMouseLeave={() => setIsDragging(false)}
+                      // @fix: Fixed ReferenceError 'setIsLoggedIn' by replacing it with 'setIsDragging'
+                      onMouseUp={() => setIsDragging(false)}
+                      onMouseMove={(e) => onMouseMove(e, itemIdx)}
+                      className={`absolute inset-0 w-full h-full overflow-y-auto no-scrollbar transition-opacity duration-1000 ease-in-out ${
+                        itemIdx === activeItemIndex ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                      } ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                     >
+                      <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
+                      
                       {item.images.map((img, imgIdx) => (
                         <div
                           key={imgIdx}
-                          className={`w-full transform transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) ${
+                          className={`absolute inset-0 w-full h-full transform transition-all duration-700 cubic-bezier(0.4, 0, 0.2, 1) ${
                             imgIdx === subImageIndices[itemIdx] 
-                              ? 'block opacity-100 scale-100 translate-y-0' 
-                              : 'hidden opacity-0 scale-95 translate-y-2'
+                              ? 'opacity-100 scale-100 z-10' 
+                              : 'opacity-0 scale-105 z-0'
                           }`}
                         >
                           <img 
@@ -232,7 +230,8 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-6 mt-8 bg-white/80 px-5 py-2.5 rounded-full border border-gray-100 shadow-sm backdrop-blur-md">
+              {/* 하단 페이징 컨트롤 */}
+              <div className="flex items-center gap-6 mt-8 bg-white/80 px-5 py-2.5 rounded-full border border-gray-100 shadow-sm backdrop-blur-md z-20">
                 <button onClick={(e) => handlePrevSubImage(e, activeItemIndex)} disabled={subImageIndices[activeItemIndex] === 0} className="p-1.5 rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-10 transition-all">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
                 </button>
