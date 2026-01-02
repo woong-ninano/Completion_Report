@@ -192,7 +192,10 @@ const App: React.FC = () => {
             <span>현대해상화재보험(주) CM사업본부</span>
             <span className="hidden md:block w-px h-3 bg-gray-100"></span>
             <span>디지털 플랫폼 고도화 구축 완료 보고</span>
-            <button onClick={() => window.location.hash = '#admin'} className="opacity-0 hover:opacity-100 transition-opacity underline">ADMIN</button>
+          </div>
+          {/* Admin 버튼을 한 칸 아래로 이동 */}
+          <div className="mt-6">
+            <button onClick={() => window.location.hash = '#admin'} className="text-[10px] text-gray-300 opacity-0 hover:opacity-100 transition-opacity underline decoration-dotted">ADMIN</button>
           </div>
         </div>
       </footer>

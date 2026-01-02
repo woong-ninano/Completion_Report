@@ -181,7 +181,8 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
           </div>
 
           <div className="flex-1 w-[40%] flex flex-col items-center justify-center h-full">
-            <div className="flex flex-col items-center w-full">
+            {/* 우측 이미지 영역을 54px 아래로 정렬 */}
+            <div className="flex flex-col items-center w-full transform translate-y-[54px]">
               {/* PC 폰 프레임: p-0으로 밀착 */}
               <div className="relative w-full max-w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-30"></div>
