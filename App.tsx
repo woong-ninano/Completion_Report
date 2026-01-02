@@ -204,7 +204,7 @@ const App: React.FC = () => {
           <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-xs md:text-sm font-medium text-gray-400 relative">
             <span>현대해상화재보험(주) CM사업본부</span>
             <span className="hidden md:block w-px h-3 bg-gray-200"></span>
-            <span>디지털 플랫폼 고도화 구축 완료 보고.</span>
+            <span>디지털 플랫폼 고도화 구축 완료 보고</span>
             <button onClick={() => window.location.hash = '#admin'} className="absolute -right-4 bottom-0 md:static opacity-10 hover:opacity-100 transition-opacity text-[10px] font-bold underline decoration-dotted ml-4">ADMIN</button>
           </div>
         </div>
