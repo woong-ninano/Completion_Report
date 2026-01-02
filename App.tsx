@@ -84,6 +84,7 @@ const App: React.FC = () => {
         return false;
       }
       setConfig(newConfig);
+      alert('설정이 성공적으로 저장되었습니다!');
       return true;
     } catch (err: any) {
       alert(`시스템 오류: ${err.message}`);
@@ -193,7 +194,6 @@ const App: React.FC = () => {
             <span className="hidden md:block w-px h-3 bg-gray-100"></span>
             <span>디지털 플랫폼 고도화 구축 완료 보고</span>
           </div>
-          {/* Admin 버튼을 한 칸 아래로 이동 */}
           <div className="mt-6">
             <button onClick={() => window.location.hash = '#admin'} className="text-[10px] text-gray-300 opacity-0 hover:opacity-100 transition-opacity underline decoration-dotted">ADMIN</button>
           </div>

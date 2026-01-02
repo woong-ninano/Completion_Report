@@ -5,13 +5,14 @@ import { uploadImage } from '../lib/supabase';
 
 interface AdminDashboardProps {
   config: SiteConfig;
-  onSave: (newConfig: SiteConfig) => void;
+  onSave: (newConfig: SiteConfig) => Promise<boolean>;
   onLogout: () => void;
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogout }) => {
   const [editConfig, setEditConfig] = useState<SiteConfig>(config);
   const [isUploading, setIsUploading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [showPwdChange, setShowPwdChange] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showRlsGuide, setShowRlsGuide] = useState(false);
@@ -98,6 +99,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
     alert('비밀번호가 변경되었습니다. 상단의 [설정 저장하기] 버튼을 눌러야 최종 반영됩니다.');
   };
 
+  const handleSaveConfig = async () => {
+    if (isSaving) return;
+    try {
+      setIsSaving(true);
+      await onSave(editConfig);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 pt-12 pb-24 px-6 overflow-y-auto text-[#333]">
       {/* RLS Error Modal */}
@@ -131,21 +142,23 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
           <div className="flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
               <span className="text-[#004a99]">시스템</span> 관리자
-              {isUploading && (
+              {(isUploading || isSaving) && (
                 <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-full">
                   <div className="w-2 h-2 bg-blue-500 rounded-full animate-ping"></div>
-                  <span className="text-xs font-bold text-blue-500 uppercase">Uploading</span>
+                  <span className="text-xs font-bold text-blue-500 uppercase">
+                    {isUploading ? 'Uploading' : 'Saving'}
+                  </span>
                 </div>
               )}
             </h1>
             <div className="flex gap-3">
               <button onClick={onLogout} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">로그아웃</button>
               <button 
-                disabled={isUploading}
-                onClick={() => onSave(editConfig)} 
-                className={`px-8 py-2 bg-[#004a99] text-white font-bold rounded-xl hover:bg-blue-800 transition-all shadow-lg hover:shadow-blue-200/50 ${isUploading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={isUploading || isSaving}
+                onClick={handleSaveConfig} 
+                className={`px-8 py-2 bg-[#004a99] text-white font-bold rounded-xl hover:bg-blue-800 transition-all shadow-lg hover:shadow-blue-200/50 ${(isUploading || isSaving) ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
-                설정 저장하기
+                {isSaving ? '저장 중...' : '설정 저장하기'}
               </button>
             </div>
           </div>
