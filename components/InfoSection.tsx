@@ -155,7 +155,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
         className="hidden md:block relative w-full"
         style={{ height: `${items.length * 100}vh` }}
       >
-        <div className="sticky top-0 h-screen w-full flex flex-row items-center justify-center gap-20 lg:gap-32 overflow-hidden max-w-7xl mx-auto px-12">
+        <div className="sticky top-0 h-screen w-full flex flex-row items-center justify-center gap-20 lg:gap-64 overflow-hidden max-w-7xl mx-auto px-12">
           {/* Left: Text Area (Width constrained to 400px) */}
           <div className="w-[400px] shrink-0 flex items-center h-full">
             <div className="relative w-full">
