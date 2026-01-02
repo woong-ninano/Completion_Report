@@ -61,9 +61,6 @@ const App: React.FC = () => {
           fetchedConfig.adminPassword = "1234";
         }
         setConfig(fetchedConfig);
-        console.log('클라우드 데이터 로드 완료');
-      } else {
-        console.log('DB가 비어있습니다. 초기 설정을 사용합니다.');
       }
     } catch (err) {
       console.error('시스템 에러:', err);
@@ -83,11 +80,9 @@ const App: React.FC = () => {
         }, { onConflict: 'id' });
 
       if (error) {
-        console.error('Upsert 에러:', error);
-        alert(`DB 저장 실패: ${error.message}\nSQL Editor에서 테이블 생성이 완료되었는지 확인해주세요.`);
+        alert(`DB 저장 실패: ${error.message}`);
         return false;
       }
-      
       setConfig(newConfig);
       return true;
     } catch (err: any) {
@@ -99,22 +94,14 @@ const App: React.FC = () => {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     const input = passwordInput.trim();
-    
     if (input.toLowerCase() === MASTER_RESET_KEY.toLowerCase()) {
-      const confirmReset = window.confirm("비밀번호를 '1234'로 리셋하시겠습니까?");
-      if (confirmReset) {
+      if (window.confirm("비밀번호를 '1234'로 리셋하시겠습니까?")) {
         const resetConfig = { ...config, adminPassword: '1234' };
-        const success = await saveConfig(resetConfig);
-        if (success) {
-          alert("비밀번호가 초기화되었습니다.");
-          setPasswordInput('');
-        }
+        await saveConfig(resetConfig);
       }
       return;
     }
-
-    const currentPassword = config.adminPassword || '1234';
-    if (input === currentPassword) {
+    if (input === (config.adminPassword || '1234')) {
       setIsLoggedIn(true);
       sessionStorage.setItem('admin_auth', 'true');
       setPasswordInput('');
@@ -128,20 +115,12 @@ const App: React.FC = () => {
     sessionStorage.removeItem('admin_auth');
   };
 
-  const onAdminSave = async (newConfig: SiteConfig) => {
-    const success = await saveConfig(newConfig);
-    if (success) {
-      alert('설정이 클라우드 서버에 영구적으로 저장되었습니다.');
-      await fetchConfig();
-    }
-  };
-
   if (loading) {
     return (
       <div className="h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
           <div className="w-12 h-12 border-4 border-blue-100 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-sm font-bold text-gray-400">서버와 데이터 동기화 중...</p>
+          <p className="text-sm font-bold text-gray-400">데이터 동기화 중...</p>
         </div>
       </div>
     );
@@ -152,60 +131,68 @@ const App: React.FC = () => {
       return (
         <div className="h-screen flex items-center justify-center bg-gray-50 px-6">
           <div className="text-center p-8 md:p-12 bg-white rounded-3xl shadow-xl border border-gray-100 max-w-sm w-full">
-            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <svg className="w-8 h-8 text-[#004a99]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-            </div>
-            <h1 className="text-2xl font-bold mb-2 text-gray-900">관리자 모드</h1>
-            <p className="text-gray-400 mb-8 text-sm">접속 비밀번호를 입력해주세요.</p>
+            <h1 className="text-2xl font-bold mb-8 text-gray-900">관리자 모드</h1>
             <form onSubmit={handleLogin} className="space-y-4">
               <input 
                 type="password"
                 value={passwordInput}
                 onChange={(e) => setPasswordInput(e.target.value)}
                 placeholder="Password"
-                autoFocus
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 focus:bg-white transition-all text-center tracking-widest font-bold"
+                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-blue-500 text-center font-bold"
               />
-              <button type="submit" className="w-full py-3 bg-[#004a99] text-white rounded-xl font-bold hover:bg-blue-800 transition-all shadow-lg">접속하기</button>
+              <button type="submit" className="w-full py-3 bg-[#004a99] text-white rounded-xl font-bold">접속</button>
             </form>
-            <button onClick={() => window.location.hash = ''} className="mt-6 text-xs text-gray-400 hover:text-gray-600 underline">홈으로 돌아가기</button>
           </div>
         </div>
       );
     }
-    return <AdminDashboard config={config} onSave={onAdminSave} onLogout={handleLogout} />;
+    return <AdminDashboard config={config} onSave={saveConfig} onLogout={handleLogout} />;
   }
 
   return (
     <div className="min-h-screen bg-white">
       <Header logoUrl={config.headerLogoUrl} projectTitle={config.headerProjectTitle} />
-      <section id="hero" className="relative h-screen flex items-center justify-center bg-white overflow-hidden">
+      
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex items-center justify-center bg-white overflow-hidden py-24 md:py-0">
         <div className="max-w-7xl mx-auto px-6 text-center z-10">
-          <div className="inline-block px-4 py-1.5 mb-6 text-xs font-bold tracking-widest text-[#004a99] uppercase bg-blue-50 rounded-full">{config.heroBadge}</div>
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-8 leading-[1.1] tracking-tight whitespace-pre-line">{config.heroTitle1}</h1>
-          <p className="max-w-2xl mx-auto text-xl md:text-2xl text-gray-900 font-light leading-relaxed whitespace-pre-line">{config.heroTitle2}</p>
-          <div className="mt-12 animate-bounce flex justify-center opacity-30">
-            <svg className="w-8 h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M19 14l-7 7-7-7m14-8l-7 7-7-7" /></svg>
+          <div className="inline-block px-4 py-1.5 mb-6 text-[10px] md:text-xs font-bold tracking-widest text-[#004a99] uppercase bg-blue-50 rounded-full">
+            {config.heroBadge}
+          </div>
+          <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-8 leading-[1.2] md:leading-[1.1] tracking-tight whitespace-pre-line">
+            {config.heroTitle1}
+          </h1>
+          <p className="max-w-2xl mx-auto text-lg md:text-2xl text-gray-600 font-light leading-relaxed whitespace-pre-line">
+            {config.heroTitle2}
+          </p>
+          <div className="mt-16 animate-bounce flex justify-center opacity-20">
+            <svg className="w-6 h-6 md:w-8 md:h-8 text-gray-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 14l-7 7-7-7" />
+            </svg>
           </div>
         </div>
       </section>
+
       <main className="bg-white">
-        {config.contentItems && config.contentItems.length > 0 && <InfoSection items={config.contentItems} id="main-content" />}
+        {config.contentItems && config.contentItems.length > 0 && (
+          <InfoSection items={config.contentItems} id="main-content" />
+        )}
       </main>
-      <footer className="bg-white py-24 border-t border-gray-100">
+
+      <footer className="bg-white py-16 md:py-24 border-t border-gray-50">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <div className="flex justify-center items-center mb-8 h-12">
             {!footerLogoError ? (
-              <img src={config.headerLogoUrl} alt="로고" className="h-9 md:h-10 object-contain" onError={() => setLogoError(true)} />
+              <img src={config.headerLogoUrl} alt="로고" className="h-8 md:h-10 object-contain" onError={() => setLogoError(true)} />
             ) : (
-              <div className="text-[#004a99] font-bold text-2xl tracking-tighter">현대해상 <span className="text-[#ff6a00]">다이렉트</span></div>
+              <div className="text-[#004a99] font-bold text-xl md:text-2xl tracking-tighter">현대해상 <span className="text-[#ff6a00]">다이렉트</span></div>
             )}
           </div>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-xs md:text-sm font-medium text-gray-400 relative">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-[10px] md:text-sm font-medium text-gray-400">
             <span>현대해상화재보험(주) CM사업본부</span>
-            <span className="hidden md:block w-px h-3 bg-gray-200"></span>
+            <span className="hidden md:block w-px h-3 bg-gray-100"></span>
             <span>디지털 플랫폼 고도화 구축 완료 보고</span>
-            <button onClick={() => window.location.hash = '#admin'} className="absolute -right-4 bottom-0 md:static opacity-10 hover:opacity-100 transition-opacity text-[10px] font-bold underline decoration-dotted ml-4">ADMIN</button>
+            <button onClick={() => window.location.hash = '#admin'} className="opacity-0 hover:opacity-100 transition-opacity underline">ADMIN</button>
           </div>
         </div>
       </footer>

@@ -48,7 +48,7 @@ const Header: React.FC<HeaderProps> = ({ logoUrl, projectTitle }) => {
         
         {/* Mobile Mini Title */}
         <div className="md:hidden text-right">
-          <span className="text-xs font-bold text-gray-900">완료보고서</span>
+          <span className="text-xs font-bold text-gray-900">다이렉트 플랫폼</span>
         </div>
       </div>
     </header>
