@@ -99,11 +99,14 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
               </p>
             </div>
 
-            {/* 이미지 영역: 폭 고정 및 상단 정렬 노출 */}
+            {/* 이미지 영역: 프레임 테두리에 완전 밀착 (상단/좌우 여백 제거) */}
             <div className="flex flex-col items-center w-full">
-              <div className="relative w-full max-w-[240px] aspect-[9/19] bg-white rounded-[2.5rem] p-1.5 shadow-[0_20px_60px_rgba(0,0,0,0.08)] border-[6px] border-black overflow-hidden">
+              <div className="relative w-full max-w-[260px] aspect-[9/19] bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.08)] border-[6px] border-black overflow-hidden">
+                {/* Notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-b-2xl z-30"></div>
-                <div className="relative w-full h-full rounded-[2rem] bg-gray-50 overflow-hidden">
+                
+                {/* Screen Content: p-0으로 여백 제거 */}
+                <div className="relative w-full h-full bg-gray-50 overflow-hidden">
                    {item.images.map((img, imgIdx) => (
                       <div
                         key={imgIdx}
@@ -111,7 +114,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                           imgIdx === subImageIndices[idx] ? 'opacity-100' : 'opacity-0 pointer-events-none'
                         }`}
                       >
-                        {/* object-cover와 object-top을 사용하여 폭을 꽉 채우고 상단만 노출 */}
                         <img 
                           src={img} 
                           alt={`${item.title} ${imgIdx}`} 
@@ -122,7 +124,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 </div>
               </div>
               
-              {/* 이미지 전환 페이징 버튼 (여러 장일 경우) */}
+              {/* 이미지 전환 페이징 버튼 */}
               {item.images.length > 1 && (
                 <div className="flex items-center gap-6 mt-6 bg-gray-50/80 px-4 py-2 rounded-full border border-gray-100">
                   <button onClick={(e) => handlePrevSubImage(e, idx)} disabled={subImageIndices[idx] === 0} className="p-1 disabled:opacity-10">
@@ -172,7 +174,8 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
 
           <div className="flex-1 w-[40%] flex flex-col items-center justify-center h-full">
             <div className="flex flex-col items-center w-full">
-              <div className="relative w-full max-w-[300px] aspect-[9/19] bg-white rounded-[3rem] p-2 shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden">
+              {/* PC 프레임에서도 p-0으로 여백 제거 */}
+              <div className="relative w-full max-w-[300px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-2xl z-30"></div>
                 <div 
                   ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
@@ -196,7 +199,13 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                             imgIdx === subImageIndices[itemIdx] ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
                           }`}
                         >
-                          <img src={img} alt={`Screen ${itemIdx}-${imgIdx}`} className="w-full object-contain object-top" draggable={false} />
+                          {/* PC에서도 object-cover와 object-top으로 폭 밀착 노출 */}
+                          <img 
+                            src={img} 
+                            alt={`Screen ${itemIdx}-${imgIdx}`} 
+                            className="w-full h-full object-cover object-top" 
+                            draggable={false} 
+                          />
                         </div>
                       ))}
                     </div>
