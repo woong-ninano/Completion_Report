@@ -50,6 +50,10 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
       next[idx] = Math.max(0, next[idx] - 1);
       return next;
     });
+    // 이미지 변경 시 스크롤 상단으로 초기화
+    if (scrollContainerRefs.current[idx]) {
+      scrollContainerRefs.current[idx]!.scrollTop = 0;
+    }
   };
 
   const handleNextSubImage = (e: React.MouseEvent, idx: number) => {
@@ -60,6 +64,10 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
       next[idx] = Math.min(maxIdx, next[idx] + 1);
       return next;
     });
+    // 이미지 변경 시 스크롤 상단으로 초기화
+    if (scrollContainerRefs.current[idx]) {
+      scrollContainerRefs.current[idx]!.scrollTop = 0;
+    }
   };
 
   const onMouseDown = (e: React.MouseEvent, idx: number) => {
@@ -105,7 +113,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 {/* Notch */}
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-b-2xl z-30"></div>
                 
-                {/* Screen Content: p-0으로 여백 제거 */}
+                {/* Screen Content */}
                 <div className="relative w-full h-full bg-gray-50 overflow-hidden">
                    {item.images.map((img, imgIdx) => (
                       <div
@@ -174,37 +182,41 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
 
           <div className="flex-1 w-[40%] flex flex-col items-center justify-center h-full">
             <div className="flex flex-col items-center w-full">
-              {/* PC 프레임에서도 p-0으로 여백 제거 */}
-              <div className="relative w-full max-w-[300px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-2xl z-30"></div>
+              {/* PC 폰 프레임: p-0으로 밀착 */}
+              <div className="relative w-full max-w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-30"></div>
+                
+                {/* 폰 화면 내부 컨테이너: overflow-y-auto를 통해 상하 스크롤 지원 */}
                 <div 
                   ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
                   onMouseDown={(e) => onMouseDown(e, activeItemIndex)}
                   onMouseLeave={() => setIsDragging(false)}
                   onMouseUp={() => setIsDragging(false)}
                   onMouseMove={(e) => onMouseMove(e, activeItemIndex)}
-                  className={`relative w-full h-full overflow-y-auto rounded-[2.4rem] bg-gray-50 no-scrollbar ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+                  className={`relative w-full h-full overflow-y-auto bg-gray-50 no-scrollbar ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
                   style={{ scrollBehavior: isDragging ? 'auto' : 'smooth' }}
                 >
                   <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
+                  
                   {items.map((item, itemIdx) => (
                     <div 
                       key={itemIdx}
-                      className={`absolute inset-0 transition-opacity duration-500 ${itemIdx === activeItemIndex ? 'opacity-100 z-10' : 'opacity-0 z-0'}`}
+                      className={`${itemIdx === activeItemIndex ? 'block relative' : 'hidden absolute'}`}
                     >
                       {item.images.map((img, imgIdx) => (
                         <div
                           key={imgIdx}
-                          className={`absolute inset-0 w-full transition-all duration-500 transform ${
-                            imgIdx === subImageIndices[itemIdx] ? 'opacity-100 scale-100' : 'opacity-0 scale-105 pointer-events-none'
+                          className={`w-full transition-opacity duration-500 ${
+                            imgIdx === subImageIndices[itemIdx] ? 'block opacity-100' : 'hidden opacity-0'
                           }`}
                         >
-                          {/* PC에서도 object-cover와 object-top으로 폭 밀착 노출 */}
+                          {/* 이미지 높이에 따라 스크롤되도록 w-full h-auto 설정 */}
                           <img 
                             src={img} 
                             alt={`Screen ${itemIdx}-${imgIdx}`} 
-                            className="w-full h-full object-cover object-top" 
+                            className="w-full h-auto block" 
                             draggable={false} 
+                            style={{ objectPosition: 'top' }}
                           />
                         </div>
                       ))}
@@ -213,6 +225,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 </div>
               </div>
 
+              {/* 하단 페이징 컨트롤 */}
               <div className="flex items-center gap-6 mt-8 bg-white/80 px-5 py-2.5 rounded-full border border-gray-100 shadow-sm backdrop-blur-md">
                 <button onClick={(e) => handlePrevSubImage(e, activeItemIndex)} disabled={subImageIndices[activeItemIndex] === 0} className="p-1.5 rounded-full text-gray-400 hover:bg-gray-50 hover:text-gray-900 disabled:opacity-10 transition-all">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" /></svg>
