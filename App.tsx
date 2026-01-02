@@ -160,10 +160,10 @@ const App: React.FC = () => {
           <div className="inline-block px-4 py-1.5 mb-6 text-[10px] md:text-xs font-bold tracking-widest text-[#004a99] uppercase bg-blue-50 rounded-full">
             {config.heroBadge}
           </div>
-          <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold text-gray-900 mb-8 leading-[1.2] md:leading-[1.1] tracking-tight whitespace-pre-line">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-[1.2] md:leading-[1.1] tracking-tight whitespace-pre-line">
             {config.heroTitle1}
           </h1>
-          <p className="max-w-2xl mx-auto text-lg md:text-2xl text-gray-600 font-light leading-relaxed whitespace-pre-line">
+          <p className="max-w-2xl mx-auto text-lg md:text-2xl text-gray-950 font-light leading-relaxed whitespace-pre-line">
             {config.heroTitle2}
           </p>
           <div className="mt-16 animate-bounce flex justify-center opacity-20">
@@ -189,9 +189,9 @@ const App: React.FC = () => {
               <div className="text-[#004a99] font-bold text-xl md:text-2xl tracking-tighter">현대해상 <span className="text-[#ff6a00]">다이렉트</span></div>
             )}
           </div>
-          <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-[10px] md:text-sm font-medium text-gray-400">
+          <div className="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8 text-[10px] md:text-sm font-medium text-gray-900">
             <span>현대해상화재보험(주) CM사업본부</span>
-            <span className="hidden md:block w-px h-3 bg-gray-100"></span>
+            <span className="hidden md:block w-px h-3 bg-gray-600"></span>
             <span>디지털 플랫폼 고도화 구축 완료 보고</span>
           </div>
           <div className="mt-6">

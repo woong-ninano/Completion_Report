@@ -168,7 +168,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                   }`}
                 >
                   <div className="text-[#004a99] font-black text-[10px] tracking-widest uppercase mb-4">Section {(idx + 1).toString().padStart(2, '0')}</div>
-                  <h2 className="text-5xl lg:text-6xl font-bold leading-tight text-gray-900 mb-6 whitespace-pre-line">
+                  <h2 className="text-4xl lg:text-5xl font-bold leading-tight text-gray-900 mb-6 whitespace-pre-line">
                     {item.title}
                   </h2>
                   <div className={`w-12 h-[3px] bg-[#004a99] mb-8 transition-all duration-700 delay-100 ${idx === activeItemIndex ? 'w-12 opacity-100' : 'w-0 opacity-0'}`}></div>
