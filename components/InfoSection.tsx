@@ -2,6 +2,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { SectionData } from '../types';
 
+const STATUS_BAR_URL = "https://i.ibb.co/HDBCBq6B/status-bar-iphone.png";
+
 const InfoSection: React.FC<SectionData> = ({ items }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const scrollContainerRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -107,14 +109,19 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
               </p>
             </div>
 
-            {/* 이미지 영역: 프레임 테두리에 완전 밀착 (상단/좌우 여백 제거) */}
+            {/* 이미지 영역: 프레임 테두리에 완전 밀착 */}
             <div className="flex flex-col items-center w-full">
-              <div className="relative w-full max-w-[260px] aspect-[9/19] bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.08)] border-[6px] border-black overflow-hidden">
+              <div className="relative w-full max-w-[260px] aspect-[9/19] bg-white rounded-[2.5rem] shadow-[0_20px_60px_rgba(0,0,0,0.08)] border-[6px] border-black overflow-hidden flex flex-col">
                 {/* Notch */}
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-b-2xl z-30"></div>
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-24 h-4 bg-black rounded-b-2xl z-40"></div>
                 
+                {/* Status Bar (Fixed at Top) */}
+                <div className="relative z-30 w-full shrink-0">
+                  <img src={STATUS_BAR_URL} alt="status bar" className="w-full h-auto block bg-white" />
+                </div>
+
                 {/* Screen Content */}
-                <div className="relative w-full h-full bg-gray-50 overflow-hidden">
+                <div className="relative flex-1 w-full bg-gray-50 overflow-hidden">
                    {item.images.map((img, imgIdx) => (
                       <div
                         key={imgIdx}
@@ -183,11 +190,11 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
           <div className="flex-1 w-[40%] flex flex-col items-center justify-center h-full">
             {/* 우측 이미지 영역을 54px 아래로 정렬 */}
             <div className="flex flex-col items-center w-full transform translate-y-[54px]">
-              {/* PC 폰 프레임: p-0으로 밀착 */}
-              <div className="relative w-full max-w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-30"></div>
+              {/* PC 폰 프레임 */}
+              <div className="relative w-full max-w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden flex flex-col">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-40"></div>
                 
-                {/* 폰 화면 내부 컨테이너: overflow-y-auto를 통해 상하 스크롤 지원 */}
+                {/* 폰 화면 내부 컨테이너 */}
                 <div 
                   ref={(el) => { scrollContainerRefs.current[activeItemIndex] = el; }}
                   onMouseDown={(e) => onMouseDown(e, activeItemIndex)}
@@ -199,6 +206,11 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                 >
                   <style>{`.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }`}</style>
                   
+                  {/* Status Bar (Sticky at Top) */}
+                  <div className="sticky top-0 z-30 w-full bg-white shrink-0">
+                    <img src={STATUS_BAR_URL} alt="status bar" className="w-full h-auto block" draggable={false} />
+                  </div>
+
                   {items.map((item, itemIdx) => (
                     <div 
                       key={itemIdx}
@@ -211,7 +223,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                             imgIdx === subImageIndices[itemIdx] ? 'block opacity-100' : 'hidden opacity-0'
                           }`}
                         >
-                          {/* 이미지 높이에 따라 스크롤되도록 w-full h-auto 설정 */}
                           <img 
                             src={img} 
                             alt={`Screen ${itemIdx}-${imgIdx}`} 
