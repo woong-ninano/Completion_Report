@@ -155,13 +155,14 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
         className="hidden md:block relative w-full"
         style={{ height: `${items.length * 100}vh` }}
       >
-        <div className="sticky top-0 h-screen w-full flex flex-row items-center overflow-hidden max-w-7xl mx-auto px-6">
-          <div className="flex-[1.2] w-[60%] flex items-center h-full">
+        <div className="sticky top-0 h-screen w-full flex flex-row items-center justify-center gap-20 lg:gap-32 overflow-hidden max-w-7xl mx-auto px-12">
+          {/* Left: Text Area (Width constrained to 400px) */}
+          <div className="w-[400px] shrink-0 flex items-center h-full">
             <div className="relative w-full">
               {items.map((item, idx) => (
                 <div
                   key={idx}
-                  className={`transition-all duration-1000 cubic-bezier(0.4, 0, 0.2, 1) w-full max-w-[85%] ${
+                  className={`transition-all duration-1000 cubic-bezier(0.4, 0, 0.2, 1) w-full ${
                     idx === activeItemIndex 
                       ? 'opacity-100 visible translate-y-0 relative z-10' 
                       : 'opacity-0 invisible absolute top-0 translate-y-12 z-0'
@@ -172,7 +173,7 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                     {item.title}
                   </h2>
                   <div className={`w-12 h-[3px] bg-[#004a99] mb-8 transition-all duration-700 delay-100 ${idx === activeItemIndex ? 'w-12 opacity-100' : 'w-0 opacity-0'}`}></div>
-                  <p className="text-2xl text-gray-900 leading-relaxed font-normal whitespace-pre-line">
+                  <p className="text-xl text-gray-800 leading-relaxed font-normal whitespace-pre-line">
                     {item.description}
                   </p>
                 </div>
@@ -180,17 +181,16 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
             </div>
           </div>
 
-          <div className="flex-1 w-[40%] flex flex-col items-center justify-center h-full">
+          {/* Right: Phone Frame Area */}
+          <div className="flex-none flex flex-col items-center justify-center h-full">
             <div className="flex flex-col items-center w-full transform translate-y-[54px]">
-              <div className="relative w-full max-w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden flex flex-col">
+              <div className="relative w-full w-[300px] lg:w-[320px] aspect-[9/19] bg-white rounded-[3rem] shadow-[0_40px_100px_rgba(0,0,0,0.12)] border-[8px] border-black overflow-hidden flex flex-col">
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 w-28 h-5 bg-black rounded-b-3xl z-50"></div>
                 
-                {/* 상단 상태바 고정 */}
                 <div className="relative z-40 w-full bg-white shrink-0">
                   <img src={STATUS_BAR_URL} alt="status bar" className="w-full h-auto block" draggable={false} />
                 </div>
 
-                {/* 폰 화면 내부 컨테이너: 모든 섹션 이미지를 절대 위치로 겹쳐서 페이드 처리 */}
                 <div className="relative flex-1 w-full bg-gray-50 overflow-hidden">
                   {items.map((item, itemIdx) => (
                     <div 
@@ -198,7 +198,6 @@ const InfoSection: React.FC<SectionData> = ({ items }) => {
                       ref={(el) => { if (itemIdx === activeItemIndex) scrollContainerRefs.current[itemIdx] = el; }}
                       onMouseDown={(e) => onMouseDown(e, itemIdx)}
                       onMouseLeave={() => setIsDragging(false)}
-                      // @fix: Fixed ReferenceError 'setIsLoggedIn' by replacing it with 'setIsDragging'
                       onMouseUp={() => setIsDragging(false)}
                       onMouseMove={(e) => onMouseMove(e, itemIdx)}
                       className={`absolute inset-0 w-full h-full overflow-y-auto no-scrollbar transition-opacity duration-1000 ease-in-out ${
