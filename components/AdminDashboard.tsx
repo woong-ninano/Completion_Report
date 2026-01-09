@@ -152,6 +152,16 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
               )}
             </h1>
             <div className="flex gap-3">
+              <a 
+                href="/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 hover:bg-gray-50 hover:text-[#004a99] hover:border-[#004a99] rounded-xl transition-all flex items-center gap-2"
+                title="새 창으로 홈 화면 열기"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                홈 화면
+              </a>
               <button onClick={onLogout} className="px-4 py-2 text-sm font-medium text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">로그아웃</button>
               <button 
                 disabled={isUploading || isSaving}

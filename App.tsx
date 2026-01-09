@@ -80,6 +80,18 @@ const App: React.FC = () => {
         }, { onConflict: 'id' });
 
       if (error) {
+        console.error('Save Error:', error);
+        
+        // RLS(Row-Level Security) 권한 에러 감지 시 가이드 제공
+        if (error.code === '42501' || error.message.includes('row-level security')) {
+          alert(
+            '⚠️ DB 저장 권한 오류 (RLS Policy)\n\n' +
+            'Supabase SQL Editor에서 아래 명령어를 실행하여 쓰기 권한을 허용해주세요:\n\n' +
+            'CREATE POLICY "Allow public all" ON public.site_configs FOR ALL USING (true) WITH CHECK (true);'
+          );
+          return false;
+        }
+
         alert(`DB 저장 실패: ${error.message}`);
         return false;
       }
