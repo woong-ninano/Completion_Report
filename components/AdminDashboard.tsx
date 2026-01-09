@@ -240,12 +240,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ config, onSave, onLogou
                 <div className="flex flex-col gap-6 mt-2">
                   <div className="grid grid-cols-1 gap-6">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">타이틀</label>
-                      <input 
+                      <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">타이틀 (줄바꿈 가능)</label>
+                      <textarea 
                         value={item.title} 
                         onChange={(e) => handleItemChange(idx, 'title', e.target.value)} 
                         placeholder="섹션의 제목을 입력하세요."
-                        className="text-xl font-bold bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all" 
+                        rows={2}
+                        className="text-xl font-bold bg-white border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-blue-500 transition-all resize-none" 
                       />
                     </div>
                     <div className="flex flex-col gap-2">
