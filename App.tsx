@@ -172,7 +172,7 @@ const App: React.FC = () => {
           <div className="inline-block px-4 py-1.5 mb-6 text-[10px] md:text-xs font-bold tracking-widest text-[#004a99] uppercase bg-blue-50 rounded-full">
             {config.heroBadge}
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-8 leading-[1.2] md:leading-[1.1] tracking-tight whitespace-pre-line">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-8 !leading-tight md:leading-[1.1] tracking-tight whitespace-pre-line">
             {config.heroTitle1}
           </h1>
           <p className="max-w-2xl mx-auto text-lg md:text-2xl text-gray-900 font-normal leading-relaxed whitespace-pre-line">
